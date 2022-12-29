@@ -30,15 +30,10 @@ import org.apache.couchdb.nouveau.api.DocumentDeleteRequest;
 import org.apache.couchdb.nouveau.api.DocumentUpdateRequest;
 import org.apache.couchdb.nouveau.api.IndexDefinition;
 import org.apache.couchdb.nouveau.api.IndexInfo;
-import org.apache.couchdb.nouveau.core.DocumentFactory;
+import org.apache.couchdb.nouveau.core.Index;
 import org.apache.couchdb.nouveau.core.IndexManager;
-import org.apache.couchdb.nouveau.core.IndexManager.Index;
-import com.codahale.metrics.annotation.Timed;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
+import com.codahale.metrics.annotation.Timed;
 
 @Path("/index/{name}")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -46,26 +41,20 @@ import org.apache.lucene.search.TermQuery;
 public class IndexResource {
 
     private final IndexManager indexManager;
-    private final DocumentFactory documentFactory;
 
-    public IndexResource(final IndexManager indexManager, final DocumentFactory documentFactory) {
+    public IndexResource(final IndexManager indexManager) {
         this.indexManager = indexManager;
-        this.documentFactory = documentFactory;
     }
 
     @GET
     @SuppressWarnings("resource")
     public IndexInfo indexInfo(@PathParam("name") String name) throws IOException {
-        final long updateSeq;
-        final int numDocs;
         final Index index = indexManager.acquire(name);
         try {
-            updateSeq = index.getUpdateSeq();
-            numDocs = index.getWriter().getDocStats().numDocs;
+            return index.info();
         } finally {
             indexManager.release(index);
         }
-        return new IndexInfo(updateSeq, numDocs);
     }
 
     @DELETE
@@ -84,9 +73,7 @@ public class IndexResource {
     public void deleteDoc(@PathParam("name") String name, @PathParam("docId") String docId, @NotNull @Valid final DocumentDeleteRequest request) throws IOException {
         final Index index = indexManager.acquire(name);
         try {
-            final IndexWriter writer = index.getWriter();
-            writer.deleteDocuments(new TermQuery(new Term("_id", docId)));
-            index.incrementUpdateSeq(request.getSeq());
+            index.delete(docId, request);
         } finally {
             indexManager.release(index);
         }
@@ -98,10 +85,7 @@ public class IndexResource {
     public void updateDoc(@PathParam("name") String name, @PathParam("docId") String docId, @NotNull @Valid final DocumentUpdateRequest request) throws IOException {
         final Index index = indexManager.acquire(name);
         try {
-            final IndexWriter writer = index.getWriter();
-            final Document doc = documentFactory.build(docId, request);
-            writer.updateDocument(new Term("_id", docId), doc);
-            index.incrementUpdateSeq(request.getSeq());
+            index.update(docId, request);
         } finally {
             indexManager.release(index);
         }

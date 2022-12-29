@@ -62,7 +62,10 @@ import org.apache.lucene.analysis.sv.SwedishAnalyzer;
 import org.apache.lucene.analysis.th.ThaiAnalyzer;
 import org.apache.lucene.analysis.tr.TurkishAnalyzer;
 
-public class AnalyzerFactory {
+public final class Lucene9AnalyzerFactory {
+
+    public Lucene9AnalyzerFactory() {
+    }
 
     public Analyzer fromDefinition(final IndexDefinition indexDefinition) {
         final Analyzer defaultAnalyzer = newAnalyzer(indexDefinition.getDefaultAnalyzer());

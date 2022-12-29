@@ -13,14 +13,12 @@
 
 package org.apache.couchdb.nouveau;
 
-import java.util.concurrent.ExecutorService;
-
-import org.apache.couchdb.nouveau.core.AnalyzerFactory;
-import org.apache.couchdb.nouveau.core.DocumentFactory;
 import org.apache.couchdb.nouveau.core.FileAlreadyExistsExceptionMapper;
 import org.apache.couchdb.nouveau.core.FileNotFoundExceptionMapper;
 import org.apache.couchdb.nouveau.core.IndexManager;
-import org.apache.couchdb.nouveau.core.ParallelSearcherFactory;
+import org.apache.couchdb.nouveau.core.Lucene9AnalyzerFactory;
+import org.apache.couchdb.nouveau.core.Lucene9IndexFactory;
+import org.apache.couchdb.nouveau.core.Lucene9ParallelSearcherFactory;
 import org.apache.couchdb.nouveau.core.UpdatesOutOfOrderExceptionMapper;
 import org.apache.couchdb.nouveau.core.ser.LuceneModule;
 import org.apache.couchdb.nouveau.health.AnalyzeHealthCheck;
@@ -28,10 +26,10 @@ import org.apache.couchdb.nouveau.health.IndexManagerHealthCheck;
 import org.apache.couchdb.nouveau.resources.AnalyzeResource;
 import org.apache.couchdb.nouveau.resources.IndexResource;
 import org.apache.couchdb.nouveau.resources.SearchResource;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jersey2.InstrumentedResourceMethodApplicationListener;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
@@ -52,14 +50,14 @@ public class NouveauApplication extends Application<NouveauApplicationConfigurat
         final MetricRegistry metricsRegistry = new MetricRegistry();
         environment.jersey().register(new InstrumentedResourceMethodApplicationListener(metricsRegistry));
 
-        final DocumentFactory documentFactory = new DocumentFactory();
-        final AnalyzerFactory analyzerFactory = new AnalyzerFactory();
+        final Lucene9AnalyzerFactory analyzerFactory = new Lucene9AnalyzerFactory();
 
-        final ExecutorService searchExecutor =
-            environment.lifecycle().executorService("nouveau-search-%d").build();
+        final Lucene9ParallelSearcherFactory searcherFactory = new Lucene9ParallelSearcherFactory();
+        searcherFactory.setExecutor(environment.lifecycle().executorService("nouveau-search-thread-%d").build());
 
-        final ParallelSearcherFactory searcherFactory = new ParallelSearcherFactory();
-        searcherFactory.setExecutor(searchExecutor);
+        final Lucene9IndexFactory indexFactory = new Lucene9IndexFactory();
+        indexFactory.setAnalyzerFactory(analyzerFactory);
+        indexFactory.setSearcherFactory(searcherFactory);
 
         final ObjectMapper objectMapper = environment.getObjectMapper();
         objectMapper.registerModule(new LuceneModule());
@@ -70,9 +68,9 @@ public class NouveauApplication extends Application<NouveauApplicationConfigurat
         indexManager.setMaxIndexesOpen(configuration.getMaxIndexesOpen());
         indexManager.setCommitIntervalSeconds(configuration.getCommitIntervalSeconds());
         indexManager.setIdleSeconds(configuration.getIdleSeconds());
-        indexManager.setAnalyzerFactory(analyzerFactory);
         indexManager.setObjectMapper(objectMapper);
-        indexManager.setSearcherFactory(searcherFactory);
+        indexManager.setAnalyzerFactory(analyzerFactory);
+        indexManager.setIndexFactory(indexFactory);
         environment.lifecycle().manage(indexManager);
 
         environment.jersey().register(new FileNotFoundExceptionMapper());
@@ -81,7 +79,7 @@ public class NouveauApplication extends Application<NouveauApplicationConfigurat
 
         final AnalyzeResource analyzeResource = new AnalyzeResource(analyzerFactory);
         environment.jersey().register(analyzeResource);
-        environment.jersey().register(new IndexResource(indexManager, documentFactory));
+        environment.jersey().register(new IndexResource(indexManager));
         environment.jersey().register(new SearchResource(indexManager));
 
         // health checks

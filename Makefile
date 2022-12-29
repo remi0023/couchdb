@@ -516,7 +516,7 @@ derived:
 
 .PHONY: nouveau
 nouveau:
-	@cd java/nouveau && mvn
+	@cd java/nouveau && mvn test
 
 .PHONY: nouveau-clean
 nouveau-clean:
@@ -524,4 +524,4 @@ nouveau-clean:
 
 .PHONY: nouveau-start
 nouveau-start: nouveau
-	@cd java/nouveau && mvn exec:exec -Dexec.executable="java"
+	@cd java/nouveau/server && mvn exec:exec -Dexec.executable="java"

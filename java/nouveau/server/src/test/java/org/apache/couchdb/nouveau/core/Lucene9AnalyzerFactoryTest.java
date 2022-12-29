@@ -56,7 +56,7 @@ import org.apache.lucene.analysis.th.ThaiAnalyzer;
 import org.apache.lucene.analysis.tr.TurkishAnalyzer;
 import org.junit.jupiter.api.Test;
 
-public class AnalyzerFactoryTest {
+public class Lucene9AnalyzerFactoryTest {
 
     @Test
     public void testkeyword() throws Exception {
@@ -249,7 +249,7 @@ public class AnalyzerFactoryTest {
     }
 
     private void assertAnalyzer(final String name, final Class<? extends Analyzer> clazz) throws Exception {
-        final AnalyzerFactory factory = new AnalyzerFactory();
+        final Lucene9AnalyzerFactory factory = new Lucene9AnalyzerFactory();
         assertThat(factory.newAnalyzer(name)).isInstanceOf(clazz);
     }
 

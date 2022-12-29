@@ -29,7 +29,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.couchdb.nouveau.api.AnalyzeRequest;
 import org.apache.couchdb.nouveau.api.AnalyzeResponse;
-import org.apache.couchdb.nouveau.core.AnalyzerFactory;
+import org.apache.couchdb.nouveau.core.Lucene9AnalyzerFactory;
 import com.codahale.metrics.annotation.Timed;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -41,9 +41,9 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 @Produces(MediaType.APPLICATION_JSON)
 public class AnalyzeResource {
 
-    private final AnalyzerFactory analyzerFactory;
+    private final Lucene9AnalyzerFactory analyzerFactory;
 
-    public AnalyzeResource(AnalyzerFactory analyzerFactory) {
+    public AnalyzeResource(Lucene9AnalyzerFactory analyzerFactory) {
         this.analyzerFactory = analyzerFactory;
     }
 

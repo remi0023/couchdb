@@ -18,13 +18,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.Map;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 
 import javax.validation.constraints.Min;
@@ -34,21 +28,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.couchdb.nouveau.api.IndexDefinition;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.misc.store.DirectIODirectory;
-import org.apache.lucene.search.SearcherFactory;
-import org.apache.lucene.search.SearcherManager;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.LockObtainFailedException;
-import org.apache.lucene.util.IOUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.caffeine.MetricsStatsCounter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.CacheLoader;
@@ -58,9 +44,6 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.github.benmanes.caffeine.cache.Scheduler;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.caffeine.MetricsStatsCounter;
-
 import io.dropwizard.lifecycle.Managed;
 
 public class IndexManager implements Managed {
@@ -68,124 +51,6 @@ public class IndexManager implements Managed {
     private static final int RETRY_LIMIT = 500;
     private static final int RETRY_SLEEP_MS = 5;
     private static final Logger LOGGER = LoggerFactory.getLogger(IndexManager.class);
-
-    public class Index {
-        private static final String DEFAULT_FIELD = "default";
-        private final String name;
-        private IndexWriter writer;
-        private SearcherManager searcherManager;
-        private Analyzer analyzer;
-        private final AtomicBoolean deleteOnClose = new AtomicBoolean();
-        private final AtomicLong updateSeq = new AtomicLong();
-
-        // The write lock is to ensure there are no readers/searchers when
-        // we want to close the index.
-        private ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
-        private Lock rl = rwl.readLock();
-        private Lock wl = rwl.writeLock();
-
-        private Index(
-                      String name,
-                      IndexWriter writer,
-                      SearcherManager searcherManager,
-                      Analyzer analyzer,
-                      long updateSeq) {
-            this.name = name;
-            this.writer = writer;
-            this.searcherManager = searcherManager;
-            this.analyzer = analyzer;
-            this.updateSeq.set(updateSeq);
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public IndexWriter getWriter() {
-            return writer;
-        }
-
-        public SearcherManager getSearcherManager() {
-            return searcherManager;
-        }
-
-        public QueryParser getQueryParser() {
-            return new NouveauQueryParser(DEFAULT_FIELD, analyzer);
-        }
-
-        public boolean commit() throws IOException {
-            rl.lock();
-            try {
-                writer.setLiveCommitData(generateCommitData().entrySet());
-                return writer.commit() != -1;
-            } finally {
-                rl.unlock();
-            }
-        }
-
-        public long getUpdateSeq() throws IOException {
-            return updateSeq.get();
-        }
-
-        public void incrementUpdateSeq(final long updateSeq) throws IOException {
-            final long newSeq = this.updateSeq.accumulateAndGet(updateSeq, (a, b) -> Math.max(a, b));
-            if (newSeq != updateSeq) {
-                throw new UpdatesOutOfOrderException();
-            }
-        }
-
-        public void close() throws IOException {
-            wl.lock();
-            try {
-                if (writer == null) {
-                    // Already closed.
-                    return;
-                }
-
-                // Close searcher manager
-                if (searcherManager != null) {
-                    try {
-                        searcherManager.close();
-                    } catch (IOException e) {
-                        LOGGER.info(this + " threw exception when closing searcherManager.", e);
-                    } finally {
-                        searcherManager = null;
-                    }
-                }
-
-                if (deleteOnClose.get()) {
-                    try {
-                        // No need to commit in this case.
-                        writer.rollback();
-                    } catch (IOException e) {
-                        LOGGER.info(this + " threw exception when rolling back writer.", e);
-                    } finally {
-                        writer = null;
-                    }
-                    IOUtils.rm(indexRootPath(name));
-                } else {
-                    try {
-                        writer.setLiveCommitData(generateCommitData().entrySet());
-                        writer.close();
-                        LOGGER.info("{} closed.", this);
-                    } finally {
-                        writer = null;
-                    }
-                }
-            } finally {
-                wl.unlock();
-            }
-        }
-
-        private Map<String, String> generateCommitData() {
-            return Collections.singletonMap("update_seq", Long.toString(updateSeq.get()));
-        }
-
-        @Override
-        public String toString() {
-            return "Index [name=" + name + "]";
-        }
-    }
 
     private class IndexLoader implements CacheLoader<String, Index> {
 
@@ -237,12 +102,12 @@ public class IndexManager implements Managed {
     private Path rootDir;
 
     @NotNull
-    private AnalyzerFactory analyzerFactory;
+    private Lucene9AnalyzerFactory analyzerFactory;
 
     @NotNull
     private ObjectMapper objectMapper;
 
-    private SearcherFactory searcherFactory;
+    private IndexFactory indexFactory;
 
     private MetricRegistry metricRegistry;
 
@@ -253,11 +118,11 @@ public class IndexManager implements Managed {
             final Index result = getFromCache(name);
 
             // Check if we're in the middle of closing.
-            result.rl.lock();
-            if (result.writer != null) {
+            result.lock();
+            if (!result.isClosed()) {
                 return result;
             }
-            result.rl.unlock();
+            result.unlock();
 
             // Retry after a short sleep.
             try {
@@ -271,7 +136,7 @@ public class IndexManager implements Managed {
     }
 
     public void release(final Index index) throws IOException {
-        index.rl.unlock();
+        index.unlock();
     }
 
     public void create(final String name, IndexDefinition indexDefinition) throws IOException {
@@ -301,7 +166,7 @@ public class IndexManager implements Managed {
     private void deleteIndex(final String name) throws IOException {
         final Index index = acquire(name);
         try {
-            index.deleteOnClose.set(true);
+            index.setDeleteOnClose(true);
             cache.invalidate(name);
         } finally {
             release(index);
@@ -344,7 +209,7 @@ public class IndexManager implements Managed {
         this.rootDir = rootDir;
     }
 
-    public void setAnalyzerFactory(final AnalyzerFactory analyzerFactory) {
+    public void setAnalyzerFactory(final Lucene9AnalyzerFactory analyzerFactory) {
         this.analyzerFactory = analyzerFactory;
     }
 
@@ -352,8 +217,8 @@ public class IndexManager implements Managed {
         this.objectMapper = objectMapper;
     }
 
-    public void setSearcherFactory(final SearcherFactory searcherFactory) {
-        this.searcherFactory = searcherFactory;
+    public void setIndexFactory(final IndexFactory indexFactory) {
+        this.indexFactory = indexFactory;
     }
 
     public void setMetricRegistry(final MetricRegistry metricRegistry) {
@@ -405,48 +270,9 @@ public class IndexManager implements Managed {
     }
 
     private Index openExistingIndex(final String name) throws IOException {
-        final IndexDefinition indexDefinition = objectMapper.readValue(indexDefinitionPath(name).toFile(), IndexDefinition.class);
-        final Analyzer analyzer =  analyzerFactory.fromDefinition(indexDefinition);
         final Path path = indexPath(name);
-        final Directory dir = directory(path);
-        final IndexWriter writer = newWriter(dir, analyzer);
-        final SearcherManager searcherManager = new SearcherManager(writer, searcherFactory);
-        final long updateSeq = getUpdateSeq(writer);
-        return new Index(name, writer, searcherManager, analyzer, updateSeq);
-    }
-
-    private long getUpdateSeq(final IndexWriter writer) throws IOException {
-        final Iterable<Map.Entry<String, String>> commitData = writer.getLiveCommitData();
-        if (commitData == null) {
-            return 0L;
-        }
-        for (Map.Entry<String, String> entry : commitData) {
-            if (entry.getKey().equals("update_seq")) {
-                return Long.parseLong(entry.getValue());
-            }
-        }
-        return 0L;
-    }
-
-    private IndexWriter newWriter(final Directory dir, final Analyzer analyzer) throws IOException {
-        LockObtainFailedException exceptionThrown = null;
-        for (int i = 0; i < RETRY_LIMIT; i++) {
-            try {
-                final IndexWriterConfig config = new IndexWriterConfig(analyzer);
-                config.setCommitOnClose(true);
-                config.setUseCompoundFile(false);
-                return new IndexWriter(dir, config);
-            } catch (LockObtainFailedException e) {
-                exceptionThrown = e;
-                try {
-                    Thread.sleep(RETRY_SLEEP_MS);
-                } catch (InterruptedException e1) {
-                    Thread.interrupted();
-                    break;
-                }
-            }
-        }
-        throw exceptionThrown;
+        final IndexDefinition indexDefinition = objectMapper.readValue(indexDefinitionPath(name).toFile(), IndexDefinition.class);
+        return indexFactory.open(path, indexDefinition);
     }
 
     private boolean isIndex(final Path path) {
@@ -468,10 +294,6 @@ public class IndexManager implements Managed {
         }
         throw new WebApplicationException(name + " attempts to escape from index root directory",
                 Status.BAD_REQUEST);
-    }
-
-    private Directory directory(final Path path) throws IOException {
-        return new DirectIODirectory(FSDirectory.open(path));
     }
 
 }

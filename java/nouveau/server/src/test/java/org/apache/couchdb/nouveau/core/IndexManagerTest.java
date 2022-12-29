@@ -42,7 +42,7 @@ public class IndexManagerTest {
     public void setup() throws Exception {
         manager = new IndexManager();
         manager.setMetricRegistry(new MetricRegistry());
-        manager.setAnalyzerFactory(new AnalyzerFactory());
+        manager.setAnalyzerFactory(new Lucene9AnalyzerFactory());
         manager.setCommitIntervalSeconds(5);
         manager.setObjectMapper(new ObjectMapper());
         manager.setRootDir(tempDir);

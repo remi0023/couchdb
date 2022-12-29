@@ -20,7 +20,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherFactory;
 
-public class ParallelSearcherFactory extends SearcherFactory {
+public class Lucene9ParallelSearcherFactory extends SearcherFactory {
 
     private Executor executor;
 
