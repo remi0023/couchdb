@@ -116,6 +116,25 @@ class Lucene9Index extends Index {
     }
 
     @Override
+    public boolean doCommit(final long updateSeq) throws IOException {
+        writer.setLiveCommitData(Collections.singletonMap("update_seq", Long.toString(updateSeq)).entrySet());
+        return writer.commit() != -1;
+    }
+
+    @Override
+    public void doClose(final boolean deleteOnClose) throws IOException {
+        if (deleteOnClose) {
+            // No need to commit in this case.
+            writer.rollback();
+            final Directory dir = writer.getDirectory();
+            for (final String name : dir.listAll()) {
+                dir.deleteFile(name);
+            }
+        }
+        writer.close();
+    }
+
+    @Override
     public SearchResults doSearch(final SearchRequest request) throws IOException, QueryParserException {
         final Query query = newQueryParser().parse(request);
 
@@ -271,25 +290,6 @@ class Lucene9Index extends Index {
             type = SortField.Type.STRING;
         }
         return new SortField(m.group(2), type, reverse);
-    }
-
-    @Override
-    public boolean doCommit(final long updateSeq) throws IOException {
-        writer.setLiveCommitData(Collections.singletonMap("update_seq", Long.toString(updateSeq)).entrySet());
-        return writer.commit() != -1;
-    }
-
-    @Override
-    public void doClose(final boolean deleteOnClose) throws IOException {
-        if (deleteOnClose) {
-            // No need to commit in this case.
-            writer.rollback();
-            final Directory dir = writer.getDirectory();
-            for (final String name : dir.listAll()) {
-                dir.deleteFile(name);
-            }
-        }
-        writer.close();
     }
 
     private static Document toDocument(final String docId, final DocumentUpdateRequest request) throws IOException {
