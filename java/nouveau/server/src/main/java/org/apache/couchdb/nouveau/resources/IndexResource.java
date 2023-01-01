@@ -24,7 +24,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.couchdb.nouveau.api.DocumentDeleteRequest;
 import org.apache.couchdb.nouveau.api.DocumentUpdateRequest;
@@ -49,12 +51,7 @@ public class IndexResource {
     @GET
     @SuppressWarnings("resource")
     public IndexInfo indexInfo(@PathParam("name") String name) throws IOException {
-        final Index index = indexManager.acquire(name);
-        try {
-            return index.info();
-        } finally {
-            indexManager.release(index);
-        }
+        return indexManager.acquire(name).info();
     }
 
     @DELETE
@@ -71,24 +68,14 @@ public class IndexResource {
     @Timed
     @Path("/doc/{docId}")
     public void deleteDoc(@PathParam("name") String name, @PathParam("docId") String docId, @NotNull @Valid final DocumentDeleteRequest request) throws IOException {
-        final Index index = indexManager.acquire(name);
-        try {
-            index.delete(docId, request);
-        } finally {
-            indexManager.release(index);
-        }
+        indexManager.acquire(name).delete(docId, request);
     }
 
     @PUT
     @Timed
     @Path("/doc/{docId}")
     public void updateDoc(@PathParam("name") String name, @PathParam("docId") String docId, @NotNull @Valid final DocumentUpdateRequest request) throws IOException {
-        final Index index = indexManager.acquire(name);
-        try {
-            index.update(docId, request);
-        } finally {
-            indexManager.release(index);
-        }
+        indexManager.acquire(name).update(docId, request);
     }
 
 }

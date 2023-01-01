@@ -13,8 +13,6 @@
 
 package org.apache.couchdb.nouveau;
 
-import org.apache.couchdb.nouveau.core.FileAlreadyExistsExceptionMapper;
-import org.apache.couchdb.nouveau.core.FileNotFoundExceptionMapper;
 import org.apache.couchdb.nouveau.core.IndexManager;
 import org.apache.couchdb.nouveau.core.Lucene9AnalyzerFactory;
 import org.apache.couchdb.nouveau.core.Lucene9IndexFactory;
@@ -73,8 +71,6 @@ public class NouveauApplication extends Application<NouveauApplicationConfigurat
         indexManager.setIndexFactory(indexFactory);
         environment.lifecycle().manage(indexManager);
 
-        environment.jersey().register(new FileNotFoundExceptionMapper());
-        environment.jersey().register(new FileAlreadyExistsExceptionMapper());
         environment.jersey().register(new UpdatesOutOfOrderExceptionMapper());
 
         final AnalyzeResource analyzeResource = new AnalyzeResource(analyzerFactory);

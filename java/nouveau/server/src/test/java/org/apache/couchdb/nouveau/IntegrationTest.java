@@ -54,7 +54,7 @@ public class IntegrationTest {
     );
 
     @Test
-    public void indexTest() {
+    public void indexTest() throws Exception{
         final String url = "http://localhost:" + APP.getLocalPort();
         final String indexName = "foo";
         final IndexDefinition indexDefinition = new IndexDefinition(LUCENE_9, "standard", null);
@@ -117,10 +117,6 @@ public class IntegrationTest {
                 APP.client().target("http://localhost:" + APP.getAdminPort() + "/healthcheck")
                 .request()
                 .get();
-
-        //healthCheckResponse.bufferEntity();
-        //InputStream in = (InputStream) healthCheckResponse.getEntity();
-        //System.err.printf("health check response: %s\n", new String(in.readAllBytes()));
 
         assertThat(healthCheckResponse)
                 .extracting(Response::getStatus)

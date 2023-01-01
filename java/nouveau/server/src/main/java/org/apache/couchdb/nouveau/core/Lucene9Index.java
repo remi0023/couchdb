@@ -81,7 +81,6 @@ class Lucene9Index extends Index {
             throws IOException {
         final Directory dir = new DirectIODirectory(FSDirectory.open(path));
         final IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        config.setCommitOnClose(true);
         config.setUseCompoundFile(false);
         final IndexWriter writer = new IndexWriter(dir, config);
         final long updateSeq = getUpdateSeq(writer);
@@ -122,16 +121,13 @@ class Lucene9Index extends Index {
     }
 
     @Override
-    public void doClose(final boolean deleteOnClose) throws IOException {
-        if (deleteOnClose) {
-            // No need to commit in this case.
-            writer.rollback();
-            final Directory dir = writer.getDirectory();
-            for (final String name : dir.listAll()) {
-                dir.deleteFile(name);
-            }
-        }
+    public void doClose() throws IOException {
         writer.close();
+    }
+
+    @Override
+    public boolean isOpen() {
+        return writer.isOpen();
     }
 
     @Override

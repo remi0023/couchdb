@@ -48,12 +48,7 @@ public class SearchResource {
     @Path("/search")
     public SearchResults searchIndex(@PathParam("name") String name, @NotNull @Valid SearchRequest searchRequest)
             throws IOException, QueryParserException {
-        final Index index = indexManager.acquire(name);
-        try {
-            return index.search(searchRequest);
-        } finally {
-            indexManager.release(index);
-        }
+        return indexManager.acquire(name).search(searchRequest);
     }
 
 }

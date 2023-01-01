@@ -44,18 +44,12 @@ public class IndexManagerHealthCheck extends HealthCheck {
 
         indexManager.create(name, new IndexDefinition(LUCENE_9, "standard", null));
         final Index index = indexManager.acquire(name);
-        try {
-            final DocumentUpdateRequest request = new DocumentUpdateRequest(1, null, Collections.emptyList());
-            index.update("foo", request);
-            index.commit();
-            index.setDeleteOnClose(true);
-            index.close();
-            return Result.healthy();
-        } catch (final IOException e) {
-            return Result.unhealthy(e);
-        } finally {
-            indexManager.release(index);
-        }
+        final DocumentUpdateRequest request = new DocumentUpdateRequest(1, null, Collections.emptyList());
+        index.update("foo", request);
+        index.commit();
+        index.setDeleteOnClose(true);
+        indexManager.invalidate(name);
+        return Result.healthy();
     }
 
 }

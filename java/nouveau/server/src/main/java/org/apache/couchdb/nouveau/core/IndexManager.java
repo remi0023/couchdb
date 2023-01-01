@@ -18,7 +18,6 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.concurrent.CompletionException;
 import java.util.stream.Stream;
 
 import javax.validation.constraints.Min;
@@ -28,6 +27,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.couchdb.nouveau.api.IndexDefinition;
+import org.apache.lucene.util.IOUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -46,48 +46,46 @@ import com.github.benmanes.caffeine.cache.Scheduler;
 
 import io.dropwizard.lifecycle.Managed;
 
-public class IndexManager implements Managed {
+public final class IndexManager implements Managed {
 
-    private static final int RETRY_LIMIT = 500;
-    private static final int RETRY_SLEEP_MS = 5;
     private static final Logger LOGGER = LoggerFactory.getLogger(IndexManager.class);
 
     private class IndexLoader implements CacheLoader<String, Index> {
 
         @Override
         public @Nullable Index load(@NonNull String name) throws Exception {
-            return openExistingIndex(name);
+            final Path path = indexPath(name);
+            final IndexDefinition indexDefinition = objectMapper.readValue(indexDefinitionPath(name).toFile(),
+                    IndexDefinition.class);
+            return indexFactory.open(path, indexDefinition);
         }
 
         @Override
         public @Nullable Index reload(@NonNull String name, @NonNull Index index) throws Exception {
-            try {
-                if (index.commit()) {
-                    LOGGER.info("{} committed.", index);
-                }
-            } catch (final IOException e) {
-                LOGGER.error(index + " threw exception when committing.", e);
-                index.close();
-                return openExistingIndex(name);
+            if (index.commit()) {
+                LOGGER.info("{} committed.", name);
             }
             return index;
         }
 
     }
 
-    private static class IndexCloser implements RemovalListener<String, Index> {
+    private class IndexRemovalListener implements RemovalListener<String, Index> {
 
         public void onRemoval(String name, Index index, RemovalCause cause) {
             try {
-                index.close();
-            } catch (IOException e) {
+                if (index.isOpen()) {
+                    LOGGER.info("{} closing.", name);
+                    index.close();
+                    if (index.isDeleteOnClose()) {
+                        IOUtils.rm(indexRootPath(name));
+                    }
+                }
+            } catch (final IOException e) {
                 LOGGER.error(index + " threw exception when closing", e);
             }
         }
     }
-
-    private static final IndexCloser INDEX_CLOSER = new IndexCloser();
-
 
     @Min(1)
     private int maxIndexesOpen;
@@ -114,33 +112,34 @@ public class IndexManager implements Managed {
     private LoadingCache<String, Index> cache;
 
     public Index acquire(final String name) throws IOException {
-        for (int i = 0; i < RETRY_LIMIT; i++) {
-            final Index result = getFromCache(name);
-
-            // Check if we're in the middle of closing.
-            result.lock();
-            if (!result.isClosed()) {
-                return result;
-            }
-            result.unlock();
-
-            // Retry after a short sleep.
-            try {
-                Thread.sleep(RETRY_SLEEP_MS);
-            } catch (InterruptedException e) {
-                Thread.interrupted();
-                break;
-            }
+        if (!exists(name)) {
+            throw new WebApplicationException("Index does not exist", Status.NOT_FOUND);
         }
-        throw new IOException("Failed to acquire " + name);
+        return cache.get(name);
     }
 
-    public void release(final Index index) throws IOException {
-        index.unlock();
+    public void invalidate(final String name) {
+        cache.invalidate(name);
     }
 
     public void create(final String name, IndexDefinition indexDefinition) throws IOException {
-        createNewIndex(name, indexDefinition);
+        if (exists(name)) {
+            throw new WebApplicationException("Index already exists", Status.EXPECTATION_FAILED);
+        }
+        // Validate index definiton
+        analyzerFactory.fromDefinition(indexDefinition);
+
+        // Persist definition
+        final Path path = indexDefinitionPath(name);
+        if (Files.exists(path)) {
+            throw new FileAlreadyExistsException(name + " already exists");
+        }
+        Files.createDirectories(path.getParent());
+        objectMapper.writeValue(path.toFile(), indexDefinition);
+    }
+
+    public boolean exists(final String name) {
+        return Files.exists(indexDefinitionPath(name));
     }
 
     public void deleteAll(final String path) throws IOException {
@@ -149,7 +148,7 @@ public class IndexManager implements Managed {
             return;
         }
         Stream<Path> stream = Files.find(rootPath, 100,
-            (p, attr) -> attr.isDirectory() && isIndex(p));
+                (p, attr) -> attr.isDirectory() && isIndex(p));
         try {
             stream.forEach((p) -> {
                 try {
@@ -164,12 +163,12 @@ public class IndexManager implements Managed {
     }
 
     private void deleteIndex(final String name) throws IOException {
-        final Index index = acquire(name);
-        try {
+        final Index index = cache.getIfPresent(name);
+        if (index == null) {
+            IOUtils.rm(indexRootPath(name));
+        } else {
             index.setDeleteOnClose(true);
             cache.invalidate(name);
-        } finally {
-            release(index);
         }
     }
 
@@ -227,52 +226,22 @@ public class IndexManager implements Managed {
 
     @Override
     public void start() throws IOException {
+        final IndexRemovalListener indexRemovalListener = new IndexRemovalListener();
         cache = Caffeine.newBuilder()
-            .recordStats(() -> new MetricsStatsCounter(metricRegistry, "IndexManager"))
-            .initialCapacity(maxIndexesOpen)
-            .maximumSize(maxIndexesOpen)
-            .expireAfterAccess(Duration.ofSeconds(idleSeconds))
-            .expireAfterWrite(Duration.ofSeconds(idleSeconds))
-            .refreshAfterWrite(Duration.ofSeconds(commitIntervalSeconds))
-            .scheduler(Scheduler.systemScheduler())
-            .removalListener(INDEX_CLOSER)
-            .evictionListener(INDEX_CLOSER)
-            .build(new IndexLoader());
+                .recordStats(() -> new MetricsStatsCounter(metricRegistry, "IndexManager"))
+                .initialCapacity(maxIndexesOpen)
+                .maximumSize(maxIndexesOpen)
+                .expireAfterAccess(Duration.ofSeconds(idleSeconds))
+                .expireAfterWrite(Duration.ofSeconds(idleSeconds))
+                .refreshAfterWrite(Duration.ofSeconds(commitIntervalSeconds))
+                .scheduler(Scheduler.systemScheduler())
+                .removalListener(indexRemovalListener)
+                .build(new IndexLoader());
     }
 
     @Override
     public void stop() {
         cache.invalidateAll();
-    }
-
-    private Index getFromCache(final String name) throws IOException {
-        try {
-            return cache.get(name);
-        } catch (CompletionException e) {
-            if (e.getCause() instanceof IOException) {
-                throw (IOException) e.getCause();
-            }
-            throw e;
-        }
-    }
-
-    private void createNewIndex(final String name, final IndexDefinition indexDefinition) throws IOException {
-        // Validate index definiton
-        analyzerFactory.fromDefinition(indexDefinition);
-
-        // Persist definition
-        final Path path = indexDefinitionPath(name);
-        if (Files.exists(path)) {
-            throw new FileAlreadyExistsException(name + " already exists");
-        }
-        Files.createDirectories(path.getParent());
-        objectMapper.writeValue(path.toFile(), indexDefinition);
-    }
-
-    private Index openExistingIndex(final String name) throws IOException {
-        final Path path = indexPath(name);
-        final IndexDefinition indexDefinition = objectMapper.readValue(indexDefinitionPath(name).toFile(), IndexDefinition.class);
-        return indexFactory.open(path, indexDefinition);
     }
 
     private boolean isIndex(final Path path) {
