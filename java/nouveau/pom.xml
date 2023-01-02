@@ -14,6 +14,8 @@
   </properties>
 
   <modules>
+    <module>shaded-lucene-9.x</module>
+    <module>shaded-lucene-4.6.1</module>
     <module>server</module>
   </modules>
 

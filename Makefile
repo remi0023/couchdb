@@ -516,7 +516,7 @@ derived:
 
 .PHONY: nouveau
 nouveau:
-	@cd java/nouveau && mvn test
+	@cd java/nouveau && mvn install
 
 .PHONY: nouveau-clean
 nouveau-clean:
