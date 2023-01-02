@@ -19,7 +19,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import org.apache.lucene.facet.range.DoubleRange;
+import l9x.org.apache.lucene.facet.range.DoubleRange;
 
 class DoubleRangeSerializer extends StdSerializer<DoubleRange> {
 

@@ -13,24 +13,24 @@
 
 package org.apache.couchdb.nouveau.core.ser;
 
-import org.apache.lucene.document.BinaryDocValuesField;
-import org.apache.lucene.document.DoubleDocValuesField;
-import org.apache.lucene.document.DoublePoint;
-import org.apache.lucene.document.FloatDocValuesField;
-import org.apache.lucene.document.FloatPoint;
-import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.document.LatLonDocValuesField;
-import org.apache.lucene.document.LatLonPoint;
-import org.apache.lucene.document.LongPoint;
-import org.apache.lucene.document.SortedDocValuesField;
-import org.apache.lucene.document.SortedNumericDocValuesField;
-import org.apache.lucene.document.SortedSetDocValuesField;
-import org.apache.lucene.document.StoredField;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.document.XYDocValuesField;
-import org.apache.lucene.document.XYPointField;
-import org.apache.lucene.index.IndexableField;
+import l9x.org.apache.lucene.document.BinaryDocValuesField;
+import l9x.org.apache.lucene.document.DoubleDocValuesField;
+import l9x.org.apache.lucene.document.DoublePoint;
+import l9x.org.apache.lucene.document.FloatDocValuesField;
+import l9x.org.apache.lucene.document.FloatPoint;
+import l9x.org.apache.lucene.document.IntPoint;
+import l9x.org.apache.lucene.document.LatLonDocValuesField;
+import l9x.org.apache.lucene.document.LatLonPoint;
+import l9x.org.apache.lucene.document.LongPoint;
+import l9x.org.apache.lucene.document.SortedDocValuesField;
+import l9x.org.apache.lucene.document.SortedNumericDocValuesField;
+import l9x.org.apache.lucene.document.SortedSetDocValuesField;
+import l9x.org.apache.lucene.document.StoredField;
+import l9x.org.apache.lucene.document.StringField;
+import l9x.org.apache.lucene.document.TextField;
+import l9x.org.apache.lucene.document.XYDocValuesField;
+import l9x.org.apache.lucene.document.XYPointField;
+import l9x.org.apache.lucene.index.IndexableField;
 
 enum SupportedType {
 

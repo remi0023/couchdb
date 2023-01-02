@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import org.apache.lucene.index.IndexableField;
+import l9x.org.apache.lucene.index.IndexableField;
 
 import io.dropwizard.jackson.JsonSnakeCase;
 

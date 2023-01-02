@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.lucene.document.DoublePoint;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.StoredField;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.search.FieldDoc;
-import org.apache.lucene.util.BytesRef;
+import l9x.org.apache.lucene.document.DoublePoint;
+import l9x.org.apache.lucene.document.Field.Store;
+import l9x.org.apache.lucene.document.StoredField;
+import l9x.org.apache.lucene.document.StringField;
+import l9x.org.apache.lucene.document.TextField;
+import l9x.org.apache.lucene.search.FieldDoc;
+import l9x.org.apache.lucene.util.BytesRef;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

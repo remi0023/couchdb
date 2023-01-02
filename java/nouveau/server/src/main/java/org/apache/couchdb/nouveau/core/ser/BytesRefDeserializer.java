@@ -15,7 +15,7 @@ package org.apache.couchdb.nouveau.core.ser;
 
 import java.io.IOException;
 
-import org.apache.lucene.util.BytesRef;
+import l9x.org.apache.lucene.util.BytesRef;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

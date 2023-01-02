@@ -22,11 +22,11 @@ import java.util.List;
 import org.apache.couchdb.nouveau.core.ser.LuceneModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.lucene.document.DoublePoint;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.IndexableField;
+import l9x.org.apache.lucene.document.DoublePoint;
+import l9x.org.apache.lucene.document.Field.Store;
+import l9x.org.apache.lucene.document.StringField;
+import l9x.org.apache.lucene.document.TextField;
+import l9x.org.apache.lucene.index.IndexableField;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

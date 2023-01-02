@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import org.apache.lucene.search.FieldDoc;
-import org.apache.lucene.util.BytesRef;
+import l9x.org.apache.lucene.search.FieldDoc;
+import l9x.org.apache.lucene.util.BytesRef;
 
 public class FieldDocDeserializer extends StdDeserializer<FieldDoc> {
 
