@@ -13,7 +13,7 @@
 
 package org.apache.couchdb.nouveau.core;
 
-import l9x.org.apache.lucene.search.Query;
+import org.apache.couchdb.nouveau.l9x.lucene.search.Query;
 
 import org.apache.couchdb.nouveau.api.SearchRequest;
 

@@ -17,14 +17,14 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.List;
 
-import l9x.org.apache.lucene.queryparser.flexible.core.QueryNodeException;
-import l9x.org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
-import l9x.org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import l9x.org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
-import l9x.org.apache.lucene.queryparser.flexible.standard.config.PointsConfig;
-import l9x.org.apache.lucene.queryparser.flexible.standard.nodes.PointQueryNode;
-import l9x.org.apache.lucene.queryparser.flexible.standard.nodes.PointRangeQueryNode;
-import l9x.org.apache.lucene.queryparser.flexible.standard.nodes.TermRangeQueryNode;
+import org.apache.couchdb.nouveau.l9x.lucene.queryparser.flexible.core.QueryNodeException;
+import org.apache.couchdb.nouveau.l9x.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
+import org.apache.couchdb.nouveau.l9x.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.couchdb.nouveau.l9x.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
+import org.apache.couchdb.nouveau.l9x.lucene.queryparser.flexible.standard.config.PointsConfig;
+import org.apache.couchdb.nouveau.l9x.lucene.queryparser.flexible.standard.nodes.PointQueryNode;
+import org.apache.couchdb.nouveau.l9x.lucene.queryparser.flexible.standard.nodes.PointRangeQueryNode;
+import org.apache.couchdb.nouveau.l9x.lucene.queryparser.flexible.standard.nodes.TermRangeQueryNode;
 
 public class NumericRangeQueryProcessor extends QueryNodeProcessorImpl {
 

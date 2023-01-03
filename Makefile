@@ -514,14 +514,14 @@ derived:
 # Nouveau
 ################################################################################
 
-.PHONY: nouveau
-nouveau:
-	@cd java/nouveau && mvn install
+.PHONY: nouveau-init
+nouveau-init:
+	@$(MAKE) -C java/nouveau install-shaded-libs
 
-.PHONY: nouveau-clean
-nouveau-clean:
-	@cd java/nouveau && mvn clean
+.PHONY: nouveau-test
+nouveau-test:
+	@$(MAKE) -C java/nouveau test
 
 .PHONY: nouveau-start
-nouveau-start: nouveau
-	@cd java/nouveau/server && mvn exec:exec -Dexec.executable="java"
+nouveau-start: nouveau-test
+	@$(MAKE) -C java/nouveau/server start

@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.dropwizard.jackson.JsonSnakeCase;
 
-import l9x.org.apache.lucene.search.TotalHits;
+import org.apache.couchdb.nouveau.l9x.lucene.search.TotalHits;
 
 @JsonSnakeCase
 public class SearchResults {

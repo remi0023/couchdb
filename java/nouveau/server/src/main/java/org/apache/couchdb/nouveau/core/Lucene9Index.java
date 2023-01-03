@@ -32,39 +32,39 @@ import org.apache.couchdb.nouveau.api.DocumentUpdateRequest;
 import org.apache.couchdb.nouveau.api.SearchHit;
 import org.apache.couchdb.nouveau.api.SearchRequest;
 import org.apache.couchdb.nouveau.api.SearchResults;
-import l9x.org.apache.lucene.analysis.Analyzer;
-import l9x.org.apache.lucene.document.Document;
-import l9x.org.apache.lucene.document.Field.Store;
-import l9x.org.apache.lucene.facet.FacetResult;
-import l9x.org.apache.lucene.facet.Facets;
-import l9x.org.apache.lucene.facet.FacetsCollector;
-import l9x.org.apache.lucene.facet.FacetsCollectorManager;
-import l9x.org.apache.lucene.facet.LabelAndValue;
-import l9x.org.apache.lucene.facet.StringDocValuesReaderState;
-import l9x.org.apache.lucene.facet.StringValueFacetCounts;
-import l9x.org.apache.lucene.facet.range.DoubleRange;
-import l9x.org.apache.lucene.facet.range.DoubleRangeFacetCounts;
-import l9x.org.apache.lucene.index.IndexWriter;
-import l9x.org.apache.lucene.index.IndexWriterConfig;
-import l9x.org.apache.lucene.index.IndexableField;
-import l9x.org.apache.lucene.index.Term;
-import l9x.org.apache.lucene.misc.store.DirectIODirectory;
-import l9x.org.apache.lucene.search.CollectorManager;
-import l9x.org.apache.lucene.search.FieldDoc;
-import l9x.org.apache.lucene.search.IndexSearcher;
-import l9x.org.apache.lucene.search.MultiCollectorManager;
-import l9x.org.apache.lucene.search.Query;
-import l9x.org.apache.lucene.search.ScoreDoc;
-import l9x.org.apache.lucene.search.SearcherFactory;
-import l9x.org.apache.lucene.search.SearcherManager;
-import l9x.org.apache.lucene.search.Sort;
-import l9x.org.apache.lucene.search.SortField;
-import l9x.org.apache.lucene.search.TermQuery;
-import l9x.org.apache.lucene.search.TopDocs;
-import l9x.org.apache.lucene.search.TopFieldCollector;
-import l9x.org.apache.lucene.store.Directory;
-import l9x.org.apache.lucene.store.FSDirectory;
-import l9x.org.apache.lucene.util.BytesRef;
+import org.apache.couchdb.nouveau.l9x.lucene.analysis.Analyzer;
+import org.apache.couchdb.nouveau.l9x.lucene.document.Document;
+import org.apache.couchdb.nouveau.l9x.lucene.document.Field.Store;
+import org.apache.couchdb.nouveau.l9x.lucene.facet.FacetResult;
+import org.apache.couchdb.nouveau.l9x.lucene.facet.Facets;
+import org.apache.couchdb.nouveau.l9x.lucene.facet.FacetsCollector;
+import org.apache.couchdb.nouveau.l9x.lucene.facet.FacetsCollectorManager;
+import org.apache.couchdb.nouveau.l9x.lucene.facet.LabelAndValue;
+import org.apache.couchdb.nouveau.l9x.lucene.facet.StringDocValuesReaderState;
+import org.apache.couchdb.nouveau.l9x.lucene.facet.StringValueFacetCounts;
+import org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange;
+import org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRangeFacetCounts;
+import org.apache.couchdb.nouveau.l9x.lucene.index.IndexWriter;
+import org.apache.couchdb.nouveau.l9x.lucene.index.IndexWriterConfig;
+import org.apache.couchdb.nouveau.l9x.lucene.index.IndexableField;
+import org.apache.couchdb.nouveau.l9x.lucene.index.Term;
+import org.apache.couchdb.nouveau.l9x.lucene.misc.store.DirectIODirectory;
+import org.apache.couchdb.nouveau.l9x.lucene.search.CollectorManager;
+import org.apache.couchdb.nouveau.l9x.lucene.search.FieldDoc;
+import org.apache.couchdb.nouveau.l9x.lucene.search.IndexSearcher;
+import org.apache.couchdb.nouveau.l9x.lucene.search.MultiCollectorManager;
+import org.apache.couchdb.nouveau.l9x.lucene.search.Query;
+import org.apache.couchdb.nouveau.l9x.lucene.search.ScoreDoc;
+import org.apache.couchdb.nouveau.l9x.lucene.search.SearcherFactory;
+import org.apache.couchdb.nouveau.l9x.lucene.search.SearcherManager;
+import org.apache.couchdb.nouveau.l9x.lucene.search.Sort;
+import org.apache.couchdb.nouveau.l9x.lucene.search.SortField;
+import org.apache.couchdb.nouveau.l9x.lucene.search.TermQuery;
+import org.apache.couchdb.nouveau.l9x.lucene.search.TopDocs;
+import org.apache.couchdb.nouveau.l9x.lucene.search.TopFieldCollector;
+import org.apache.couchdb.nouveau.l9x.lucene.store.Directory;
+import org.apache.couchdb.nouveau.l9x.lucene.store.FSDirectory;
+import org.apache.couchdb.nouveau.l9x.lucene.util.BytesRef;
 
 class Lucene9Index extends Index {
 
@@ -292,12 +292,12 @@ class Lucene9Index extends Index {
         final Document result = new Document();
 
         // id
-        result.add(new l9x.org.apache.lucene.document.StringField("_id", docId, Store.YES));
-        result.add(new l9x.org.apache.lucene.document.SortedDocValuesField("_id", new BytesRef(docId)));
+        result.add(new org.apache.couchdb.nouveau.l9x.lucene.document.StringField("_id", docId, Store.YES));
+        result.add(new org.apache.couchdb.nouveau.l9x.lucene.document.SortedDocValuesField("_id", new BytesRef(docId)));
 
         // partition (optional)
         if (request.hasPartition()) {
-            result.add(new l9x.org.apache.lucene.document.StringField("_partition", request.getPartition(), Store.NO));
+            result.add(new org.apache.couchdb.nouveau.l9x.lucene.document.StringField("_partition", request.getPartition(), Store.NO));
         }
 
         for (IndexableField field : request.getFields()) {

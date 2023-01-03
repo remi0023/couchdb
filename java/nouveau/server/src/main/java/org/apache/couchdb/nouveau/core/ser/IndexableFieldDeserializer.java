@@ -21,26 +21,26 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-import l9x.org.apache.lucene.document.BinaryDocValuesField;
-import l9x.org.apache.lucene.document.DoubleDocValuesField;
-import l9x.org.apache.lucene.document.DoublePoint;
-import l9x.org.apache.lucene.document.FloatDocValuesField;
-import l9x.org.apache.lucene.document.Field.Store;
-import l9x.org.apache.lucene.document.FloatPoint;
-import l9x.org.apache.lucene.document.IntPoint;
-import l9x.org.apache.lucene.document.LatLonDocValuesField;
-import l9x.org.apache.lucene.document.LatLonPoint;
-import l9x.org.apache.lucene.document.LongPoint;
-import l9x.org.apache.lucene.document.SortedDocValuesField;
-import l9x.org.apache.lucene.document.SortedNumericDocValuesField;
-import l9x.org.apache.lucene.document.SortedSetDocValuesField;
-import l9x.org.apache.lucene.document.StoredField;
-import l9x.org.apache.lucene.document.StringField;
-import l9x.org.apache.lucene.document.TextField;
-import l9x.org.apache.lucene.document.XYDocValuesField;
-import l9x.org.apache.lucene.document.XYPointField;
-import l9x.org.apache.lucene.index.IndexableField;
-import l9x.org.apache.lucene.util.BytesRef;
+import org.apache.couchdb.nouveau.l9x.lucene.document.BinaryDocValuesField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.DoubleDocValuesField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.DoublePoint;
+import org.apache.couchdb.nouveau.l9x.lucene.document.FloatDocValuesField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.Field.Store;
+import org.apache.couchdb.nouveau.l9x.lucene.document.FloatPoint;
+import org.apache.couchdb.nouveau.l9x.lucene.document.IntPoint;
+import org.apache.couchdb.nouveau.l9x.lucene.document.LatLonDocValuesField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.LatLonPoint;
+import org.apache.couchdb.nouveau.l9x.lucene.document.LongPoint;
+import org.apache.couchdb.nouveau.l9x.lucene.document.SortedDocValuesField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.SortedNumericDocValuesField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.SortedSetDocValuesField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.StoredField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.StringField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.TextField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.XYDocValuesField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.XYPointField;
+import org.apache.couchdb.nouveau.l9x.lucene.index.IndexableField;
+import org.apache.couchdb.nouveau.l9x.lucene.util.BytesRef;
 
 class IndexableFieldDeserializer extends StdDeserializer<IndexableField> {
 

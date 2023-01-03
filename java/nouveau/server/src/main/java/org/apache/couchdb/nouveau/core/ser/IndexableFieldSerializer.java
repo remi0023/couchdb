@@ -6,10 +6,10 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import l9x.org.apache.lucene.geo.GeoEncodingUtils;
-import l9x.org.apache.lucene.geo.XYEncodingUtils;
-import l9x.org.apache.lucene.index.IndexableField;
-import l9x.org.apache.lucene.util.BytesRef;
+import org.apache.couchdb.nouveau.l9x.lucene.geo.GeoEncodingUtils;
+import org.apache.couchdb.nouveau.l9x.lucene.geo.XYEncodingUtils;
+import org.apache.couchdb.nouveau.l9x.lucene.index.IndexableField;
+import org.apache.couchdb.nouveau.l9x.lucene.util.BytesRef;
 
 class IndexableFieldSerializer extends StdSerializer<IndexableField> {
 

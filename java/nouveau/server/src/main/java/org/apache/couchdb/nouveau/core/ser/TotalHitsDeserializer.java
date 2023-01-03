@@ -14,8 +14,8 @@ package org.apache.couchdb.nouveau.core.ser;
 
 import java.io.IOException;
 
-import l9x.org.apache.lucene.search.TotalHits;
-import l9x.org.apache.lucene.search.TotalHits.Relation;
+import org.apache.couchdb.nouveau.l9x.lucene.search.TotalHits;
+import org.apache.couchdb.nouveau.l9x.lucene.search.TotalHits.Relation;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

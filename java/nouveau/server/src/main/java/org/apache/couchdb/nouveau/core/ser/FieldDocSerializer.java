@@ -19,8 +19,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import l9x.org.apache.lucene.search.FieldDoc;
-import l9x.org.apache.lucene.util.BytesRef;
+import org.apache.couchdb.nouveau.l9x.lucene.search.FieldDoc;
+import org.apache.couchdb.nouveau.l9x.lucene.util.BytesRef;
 
 public class FieldDocSerializer extends StdSerializer<FieldDoc> {
 

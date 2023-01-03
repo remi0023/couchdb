@@ -16,10 +16,10 @@ package org.apache.couchdb.nouveau.core.ser;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import l9x.org.apache.lucene.facet.range.DoubleRange;
-import l9x.org.apache.lucene.index.IndexableField;
-import l9x.org.apache.lucene.search.FieldDoc;
-import l9x.org.apache.lucene.search.TotalHits;
+import org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange;
+import org.apache.couchdb.nouveau.l9x.lucene.index.IndexableField;
+import org.apache.couchdb.nouveau.l9x.lucene.search.FieldDoc;
+import org.apache.couchdb.nouveau.l9x.lucene.search.TotalHits;
 
 public class LuceneModule extends SimpleModule {
 

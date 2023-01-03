@@ -102,12 +102,16 @@
               <shadeSourcesContent>true</shadeSourcesContent>
               <relocations>
                 <relocation>
-                  <pattern>org</pattern>
-                  <shadedPattern>l9x.org</shadedPattern>
+                  <pattern>org.apache.lucene</pattern>
+                  <shadedPattern>org.apache.couchdb.nouveau.l9x.lucene</shadedPattern>
                 </relocation>
                 <relocation>
-                  <pattern>com</pattern>
-                  <shadedPattern>l9x.com</shadedPattern>
+                  <pattern>org.tartarus</pattern>
+                  <shadedPattern>org.apache.couchdb.nouveau.l9x.tartarus</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.egothor</pattern>
+                  <shadedPattern>org.apache.couchdb.nouveau.l9x.egothor</shadedPattern>
                 </relocation>
               </relocations>
               <transformers>

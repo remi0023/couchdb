@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-import l9x.org.apache.lucene.facet.range.DoubleRange;
+import org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange;
 
 class DoubleRangeDeserializer extends StdDeserializer<DoubleRange> {
 

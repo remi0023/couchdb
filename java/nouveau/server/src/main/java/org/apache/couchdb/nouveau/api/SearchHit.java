@@ -18,8 +18,8 @@ import java.util.Collection;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import l9x.org.apache.lucene.index.IndexableField;
-import l9x.org.apache.lucene.search.FieldDoc;
+import org.apache.couchdb.nouveau.l9x.lucene.index.IndexableField;
+import org.apache.couchdb.nouveau.l9x.lucene.search.FieldDoc;
 
 import io.dropwizard.jackson.JsonSnakeCase;
 

@@ -98,12 +98,16 @@
               <shadeSourcesContent>true</shadeSourcesContent>
               <relocations>
                 <relocation>
-                  <pattern>org</pattern>
-                  <shadedPattern>l461.org</shadedPattern>
+                  <pattern>org.apache.lucene</pattern>
+                  <shadedPattern>org.apache.couchdb.nouveau.l461.lucene</shadedPattern>
                 </relocation>
                 <relocation>
-                  <pattern>com</pattern>
-                  <shadedPattern>l461.com</shadedPattern>
+                  <pattern>org.tartarus</pattern>
+                  <shadedPattern>org.apache.couchdb.nouveau.l461.tartarus</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.egothor</pattern>
+                  <shadedPattern>org.apache.couchdb.nouveau.l461.egothor</shadedPattern>
                 </relocation>
               </relocations>
               <transformers>
