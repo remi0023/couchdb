@@ -27,6 +27,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.couchdb.nouveau.api.IndexDefinition;
+import org.apache.couchdb.nouveau.core.lucene9.Lucene9AnalyzerFactory;
 import org.apache.couchdb.nouveau.l9x.lucene.util.IOUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;

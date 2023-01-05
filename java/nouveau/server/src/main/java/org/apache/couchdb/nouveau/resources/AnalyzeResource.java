@@ -29,7 +29,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.couchdb.nouveau.api.AnalyzeRequest;
 import org.apache.couchdb.nouveau.api.AnalyzeResponse;
-import org.apache.couchdb.nouveau.core.Lucene9AnalyzerFactory;
+import org.apache.couchdb.nouveau.core.lucene9.Lucene9AnalyzerFactory;
 import com.codahale.metrics.annotation.Timed;
 
 import org.apache.couchdb.nouveau.l9x.lucene.analysis.Analyzer;

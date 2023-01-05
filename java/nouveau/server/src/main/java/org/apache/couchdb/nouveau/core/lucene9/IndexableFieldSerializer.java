@@ -1,4 +1,4 @@
-package org.apache.couchdb.nouveau.core.ser;
+package org.apache.couchdb.nouveau.core.lucene9;
 
 import java.io.IOException;
 

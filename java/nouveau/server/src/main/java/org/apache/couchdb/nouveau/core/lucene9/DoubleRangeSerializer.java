@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.apache.couchdb.nouveau.core.ser;
+package org.apache.couchdb.nouveau.core.lucene9;
 
 import java.io.IOException;
 
@@ -19,22 +19,26 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import org.apache.couchdb.nouveau.l9x.lucene.util.BytesRef;
+import org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange;
 
-public class BytesRefSerializer extends StdSerializer<BytesRef> {
+class DoubleRangeSerializer extends StdSerializer<DoubleRange> {
 
-    public BytesRefSerializer() {
+    public DoubleRangeSerializer() {
         this(null);
     }
 
-    public BytesRefSerializer(Class<BytesRef> vc) {
+    public DoubleRangeSerializer(Class<DoubleRange> vc) {
         super(vc);
     }
 
     @Override
-    public void serialize(final BytesRef bytesRef, final JsonGenerator gen, final SerializerProvider provider)
+    public void serialize(final DoubleRange doubleRange, final JsonGenerator gen, final SerializerProvider provider)
             throws IOException {
-        gen.writeBinary(bytesRef.bytes, bytesRef.offset, bytesRef.length);
+        gen.writeStartObject();
+        gen.writeStringField("label", doubleRange.label);
+        gen.writeNumberField("min", doubleRange.min);
+        gen.writeNumberField("max", doubleRange.max);
+        gen.writeEndObject();
     }
 
 }

@@ -1,3 +1,4 @@
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,12 +11,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.apache.couchdb.nouveau.core.ser;
+package org.apache.couchdb.nouveau.core.lucene9;
 
 import java.io.IOException;
 
-import org.apache.couchdb.nouveau.l9x.lucene.search.TotalHits;
-import org.apache.couchdb.nouveau.l9x.lucene.search.TotalHits.Relation;
+import org.apache.couchdb.nouveau.l9x.lucene.util.BytesRef;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,23 +23,22 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-public class TotalHitsDeserializer extends StdDeserializer<TotalHits> {
+public class BytesRefDeserializer extends StdDeserializer<BytesRef> {
 
-    public TotalHitsDeserializer() {
+
+    public BytesRefDeserializer() {
         this(null);
     }
 
-    public TotalHitsDeserializer(Class<?> vc) {
+    public BytesRefDeserializer(Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public TotalHits deserialize(final JsonParser parser, final DeserializationContext context)
-            throws IOException, JsonProcessingException {
+    public BytesRef deserialize(final JsonParser parser, final DeserializationContext context)
+    throws IOException, JsonProcessingException {
         JsonNode node = parser.getCodec().readTree(parser);
-        final long value = node.get("value").asLong();
-        final Relation relation = Relation.valueOf(node.get("relation").asText());
-        return new TotalHits(value, relation);
+        return new BytesRef(node.binaryValue());
     }
 
 }

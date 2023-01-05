@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.apache.couchdb.nouveau.core.ser;
+package org.apache.couchdb.nouveau.core.lucene9;
 
 import org.apache.couchdb.nouveau.l9x.lucene.document.BinaryDocValuesField;
 import org.apache.couchdb.nouveau.l9x.lucene.document.DoubleDocValuesField;

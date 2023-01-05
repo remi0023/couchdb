@@ -19,9 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.couchdb.nouveau.core.ser.LuceneModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.couchdb.nouveau.core.lucene9.Lucene9Module;
 import org.apache.couchdb.nouveau.l9x.lucene.document.DoublePoint;
 import org.apache.couchdb.nouveau.l9x.lucene.document.Field.Store;
 import org.apache.couchdb.nouveau.l9x.lucene.document.StringField;
@@ -37,7 +37,7 @@ public class DocumentUpdateRequestTest {
     @BeforeAll
     public static void setupMapper() {
         mapper = new ObjectMapper();
-        mapper.registerModule(new LuceneModule());
+        mapper.registerModule(new Lucene9Module());
     }
 
     @Test

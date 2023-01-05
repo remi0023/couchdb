@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.apache.couchdb.nouveau.core.ser;
+package org.apache.couchdb.nouveau.core.lucene9;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -21,9 +21,9 @@ import org.apache.couchdb.nouveau.l9x.lucene.index.IndexableField;
 import org.apache.couchdb.nouveau.l9x.lucene.search.FieldDoc;
 import org.apache.couchdb.nouveau.l9x.lucene.search.TotalHits;
 
-public class LuceneModule extends SimpleModule {
+public class Lucene9Module extends SimpleModule {
 
-    public LuceneModule() {
+    public Lucene9Module() {
         super("lucene", Version.unknownVersion());
 
         // IndexableField

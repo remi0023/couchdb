@@ -11,11 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.apache.couchdb.nouveau.core.ser;
+package org.apache.couchdb.nouveau.core.lucene9;
 
 import java.io.IOException;
-
-import org.apache.couchdb.nouveau.l9x.lucene.util.BytesRef;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,22 +21,28 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-public class BytesRefDeserializer extends StdDeserializer<BytesRef> {
+import org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange;
 
+class DoubleRangeDeserializer extends StdDeserializer<DoubleRange> {
 
-    public BytesRefDeserializer() {
+    public DoubleRangeDeserializer() {
         this(null);
     }
 
-    public BytesRefDeserializer(Class<?> vc) {
+    public DoubleRangeDeserializer(Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public BytesRef deserialize(final JsonParser parser, final DeserializationContext context)
+    public DoubleRange deserialize(final JsonParser parser, final DeserializationContext context)
     throws IOException, JsonProcessingException {
         JsonNode node = parser.getCodec().readTree(parser);
-        return new BytesRef(node.binaryValue());
+        final String label = node.get("label").asText();
+        final double min = node.get("min").asDouble();
+        final boolean minInc = node.has("inclusive_min") ? node.get("inclusive_min").asBoolean() : true;
+        final double max = node.get("max").asDouble();
+        final boolean maxInc = node.has("inclusive_max") ? node.get("inclusive_max").asBoolean() : true;
+        return new DoubleRange(label, min, minInc, max, maxInc);
     }
 
 }

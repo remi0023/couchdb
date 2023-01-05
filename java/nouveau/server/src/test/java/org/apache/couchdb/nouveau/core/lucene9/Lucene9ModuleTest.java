@@ -11,13 +11,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.apache.couchdb.nouveau.core.ser;
+package org.apache.couchdb.nouveau.core.lucene9;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.couchdb.nouveau.core.lucene9.Lucene9Module;
 import org.apache.couchdb.nouveau.l9x.lucene.document.DoublePoint;
 import org.apache.couchdb.nouveau.l9x.lucene.document.Field.Store;
 import org.apache.couchdb.nouveau.l9x.lucene.document.StoredField;
@@ -28,14 +29,14 @@ import org.apache.couchdb.nouveau.l9x.lucene.util.BytesRef;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class LuceneModuleTest {
+public class Lucene9ModuleTest {
 
     private static ObjectMapper mapper;
 
     @BeforeAll
     public static void setupMapper() {
         mapper = new ObjectMapper();
-        mapper.registerModule(new LuceneModule());
+        mapper.registerModule(new Lucene9Module());
     }
 
     @Test

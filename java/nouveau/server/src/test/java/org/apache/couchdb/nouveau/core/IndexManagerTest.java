@@ -16,6 +16,8 @@ package org.apache.couchdb.nouveau.core;
 import java.nio.file.Path;
 
 import org.apache.couchdb.nouveau.api.IndexDefinition;
+import org.apache.couchdb.nouveau.core.lucene9.Lucene9AnalyzerFactory;
+
 import static org.apache.couchdb.nouveau.api.LuceneVersion.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

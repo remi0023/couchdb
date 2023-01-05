@@ -11,12 +11,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.apache.couchdb.nouveau.core;
+package org.apache.couchdb.nouveau.core.lucene9;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 import org.apache.couchdb.nouveau.api.IndexDefinition;
+import org.apache.couchdb.nouveau.core.Index;
+import org.apache.couchdb.nouveau.core.IndexFactory;
 import org.apache.couchdb.nouveau.l9x.lucene.analysis.Analyzer;
 import org.apache.couchdb.nouveau.l9x.lucene.search.SearcherFactory;
 
