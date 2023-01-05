@@ -21,12 +21,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.couchdb.nouveau.api.document.DocField;
+import org.apache.couchdb.nouveau.api.document.DoublePointDocField;
+import org.apache.couchdb.nouveau.api.document.StringDocField;
+import org.apache.couchdb.nouveau.api.document.TextDocField;
 import org.apache.couchdb.nouveau.core.lucene9.Lucene9Module;
-import org.apache.couchdb.nouveau.l9x.lucene.document.DoublePoint;
-import org.apache.couchdb.nouveau.l9x.lucene.document.Field.Store;
-import org.apache.couchdb.nouveau.l9x.lucene.document.StringField;
-import org.apache.couchdb.nouveau.l9x.lucene.document.TextField;
-import org.apache.couchdb.nouveau.l9x.lucene.index.IndexableField;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -56,10 +55,10 @@ public class DocumentUpdateRequestTest {
     }
 
     private DocumentUpdateRequest asObject() {
-        final List<IndexableField> fields = new ArrayList<IndexableField>();
-        fields.add(new StringField("stringfoo", "bar", Store.YES));
-        fields.add(new TextField("textfoo", "hello there", Store.YES));
-        fields.add(new DoublePoint("doublefoo", 12));
+        final List<DocField> fields = new ArrayList<DocField>();
+        fields.add(new StringDocField("stringfoo", "bar", true));
+        fields.add(new TextDocField("textfoo", "hello there", true));
+        fields.add(new DoublePointDocField("doublefoo", 12));
         return new DocumentUpdateRequest(12, null, fields);
     }
 

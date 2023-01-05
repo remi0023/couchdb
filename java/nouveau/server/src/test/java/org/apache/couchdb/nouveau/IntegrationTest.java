@@ -28,9 +28,8 @@ import org.apache.couchdb.nouveau.api.DocumentUpdateRequest;
 import org.apache.couchdb.nouveau.api.IndexDefinition;
 import org.apache.couchdb.nouveau.api.SearchRequest;
 import org.apache.couchdb.nouveau.api.SearchResults;
-import org.apache.couchdb.nouveau.l9x.lucene.document.DoubleDocValuesField;
-import org.apache.couchdb.nouveau.l9x.lucene.document.DoublePoint;
-import org.apache.couchdb.nouveau.l9x.lucene.document.SortedSetDocValuesField;
+import org.apache.couchdb.nouveau.api.document.StringDocField;
+import org.apache.couchdb.nouveau.api.document.TextDocField;
 import org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange;
 import org.apache.couchdb.nouveau.l9x.lucene.search.FieldDoc;
 import org.apache.couchdb.nouveau.l9x.lucene.search.TotalHits;
@@ -78,9 +77,8 @@ public class IntegrationTest {
         for (int i = 0; i < 10; i++) {
             final DocumentUpdateRequest docUpdate = new DocumentUpdateRequest(i + 1, null,
                 List.of(
-                    new DoublePoint("foo", i), 
-                    new DoubleDocValuesField("baz", i),
-                    new SortedSetDocValuesField("bar", new BytesRef("baz"))));
+                    new StringDocField("foo", "bar", true),
+                    new TextDocField("bar", "baz", true)));
             response = 
                 APP.client().target(String.format("%s/index/%s/doc/doc%d", url, indexName, i))
                 .request()

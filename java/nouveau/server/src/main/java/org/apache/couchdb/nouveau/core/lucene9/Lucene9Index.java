@@ -32,11 +32,16 @@ import org.apache.couchdb.nouveau.api.DocumentUpdateRequest;
 import org.apache.couchdb.nouveau.api.SearchHit;
 import org.apache.couchdb.nouveau.api.SearchRequest;
 import org.apache.couchdb.nouveau.api.SearchResults;
+import org.apache.couchdb.nouveau.api.document.DocField;
+import org.apache.couchdb.nouveau.api.document.DoublePointDocField;
+import org.apache.couchdb.nouveau.api.document.StringDocField;
+import org.apache.couchdb.nouveau.api.document.TextDocField;
 import org.apache.couchdb.nouveau.core.Index;
 import org.apache.couchdb.nouveau.core.QueryParser;
 import org.apache.couchdb.nouveau.core.QueryParserException;
 import org.apache.couchdb.nouveau.l9x.lucene.analysis.Analyzer;
 import org.apache.couchdb.nouveau.l9x.lucene.document.Document;
+import org.apache.couchdb.nouveau.l9x.lucene.document.DoublePoint;
 import org.apache.couchdb.nouveau.l9x.lucene.document.SortedDocValuesField;
 import org.apache.couchdb.nouveau.l9x.lucene.document.StringField;
 import org.apache.couchdb.nouveau.l9x.lucene.document.Field.Store;
@@ -305,15 +310,31 @@ class Lucene9Index extends Index {
             result.add(new StringField("_partition", request.getPartition(), Store.NO));
         }
 
-        for (IndexableField field : request.getFields()) {
+        for (DocField field : request.getFields()) {
             // Underscore-prefix is reserved.
-            if (field.name().startsWith("_")) {
+            if (field.getName().startsWith("_")) {
                 continue;
             }
-            result.add(field);
+            result.add(convertField(field));
         }
 
         return result;
+    }
+
+    private static IndexableField convertField(final DocField docField) {
+        if (docField instanceof StringDocField) {
+            final StringDocField field = (StringDocField) docField;
+            return new StringField(field.getName(), field.getValue(), field.isStored() ? Store.YES : Store.NO);
+        }
+        if (docField instanceof TextDocField) {
+            final TextDocField field = (TextDocField) docField;
+            return new StringField(field.getName(), field.getValue(), field.isStored() ? Store.YES : Store.NO);
+        }
+        if (docField instanceof DoublePointDocField) {
+            final DoublePointDocField field = (DoublePointDocField) docField;
+            return new DoublePoint(field.getName(), field.getValue());
+        }
+        throw new IllegalArgumentException(docField.getClass() + " not valid");
     }
 
     private static Query docIdQuery(final String docId) {
