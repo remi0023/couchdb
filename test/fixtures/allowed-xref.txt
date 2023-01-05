@@ -1,0 +1,4 @@
+file.erl: Warning: file:delete/2 is undefined function (Xref)
+src/smoosh_persist.erl:136: Warning: smoosh_persist:delete_file/1 calls undefined function file:delete/2 (Xref)
+src/ioq.erl: Warning: ioq:get_disk_queues/0 is undefined function (Xref)
+src/weatherreport_check_ioq.erl:95: Warning: weatherreport_check_ioq:check_legacy_int/1 calls undefined function ioq:get_disk_queues/0 (Xref)
