@@ -37,6 +37,8 @@ import org.apache.couchdb.nouveau.core.QueryParser;
 import org.apache.couchdb.nouveau.core.QueryParserException;
 import org.apache.couchdb.nouveau.l9x.lucene.analysis.Analyzer;
 import org.apache.couchdb.nouveau.l9x.lucene.document.Document;
+import org.apache.couchdb.nouveau.l9x.lucene.document.SortedDocValuesField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.StringField;
 import org.apache.couchdb.nouveau.l9x.lucene.document.Field.Store;
 import org.apache.couchdb.nouveau.l9x.lucene.facet.FacetResult;
 import org.apache.couchdb.nouveau.l9x.lucene.facet.Facets;
@@ -295,12 +297,12 @@ class Lucene9Index extends Index {
         final Document result = new Document();
 
         // id
-        result.add(new org.apache.couchdb.nouveau.l9x.lucene.document.StringField("_id", docId, Store.YES));
-        result.add(new org.apache.couchdb.nouveau.l9x.lucene.document.SortedDocValuesField("_id", new BytesRef(docId)));
+        result.add(new StringField("_id", docId, Store.YES));
+        result.add(new SortedDocValuesField("_id", new BytesRef(docId)));
 
         // partition (optional)
         if (request.hasPartition()) {
-            result.add(new org.apache.couchdb.nouveau.l9x.lucene.document.StringField("_partition", request.getPartition(), Store.NO));
+            result.add(new StringField("_partition", request.getPartition(), Store.NO));
         }
 
         for (IndexableField field : request.getFields()) {
