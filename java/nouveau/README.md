@@ -103,3 +103,57 @@ To ease migration nouveau functions can use the 'index' function exactly as it e
 | index("foo", "bar", "stored_string");              | adds a StoredField.
 | index("foo", "bar", "sorted_set_dv");              | adds a SortedSetDocValuesField.
 | index("foo", "bar", "string", true);               | adds a TextField with Store.YES
+
+
+## Architecture
+
+Nouveau consists of two main components;
+
+### Shaded Lucene Libraries
+
+In order to support index migration we've chosen to include multiple
+versions of Lucene at the same time and treat each major release as
+independent of the others. You upgrade a nouveau index by rebuilding
+from scratch on the new version.
+
+To accomplish this we relocate the lucene classes so that the package
+names are distinct, using the Maven Shade Plugin.
+
+Nouveau only supports one release of each supported major version and
+will update those versions as part of its own release cycle. An
+exception is made for Lucene 4.6.1 which is included to aid index
+migration from Clouseau. We will not upgrade the version of Lucene 4
+in future releases, users must migrate to Lucene 9 or higher.
+
+### Dropwizard Server
+
+Nouveau uses the dropwizard framework to provide an HTTP interface to
+core Lucene functionality.
+
+Within this project are the following components;
+
+#### api
+
+The api package (and its subpackages) contains classes that represents
+the request and response bodies for all HTTP requests. Like CouchDB,
+these are represented in JSON on the wire.
+
+This package does not depend on any version of Lucene.
+
+#### core
+
+This package contains the main code, independent of Lucene
+version. Subpackages provide Lucene-version specific implementations
+of interfaces or abstract classes from the core package.
+
+#### health
+
+This package contains dropwizard health check code that verifies the
+correct working of Nouveau.
+
+#### resources
+
+This package (and its subpackages) contains the classes for the
+dropwizard-enabled endpoints themselves.
+
+These are specific to a Lucene major release.
