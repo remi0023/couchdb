@@ -44,6 +44,7 @@ import org.apache.couchdb.nouveau.l9x.lucene.document.Document;
 import org.apache.couchdb.nouveau.l9x.lucene.document.DoublePoint;
 import org.apache.couchdb.nouveau.l9x.lucene.document.SortedDocValuesField;
 import org.apache.couchdb.nouveau.l9x.lucene.document.StringField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.TextField;
 import org.apache.couchdb.nouveau.l9x.lucene.document.Field.Store;
 import org.apache.couchdb.nouveau.l9x.lucene.facet.FacetResult;
 import org.apache.couchdb.nouveau.l9x.lucene.facet.Facets;
@@ -207,10 +208,10 @@ class Lucene9Index extends Index {
         for (final ScoreDoc scoreDoc : topDocs.scoreDocs) {
             final Document doc = searcher.doc(scoreDoc.doc);
 
-            final List<IndexableField> fields = new ArrayList<IndexableField>(doc.getFields());
+            final List<DocField> fields = new ArrayList<DocField>(doc.getFields().size());
             for (IndexableField field : doc.getFields()) {
-                if (field.name().equals("_id")) {
-                    fields.remove(field);
+                if (!field.name().startsWith("_")) {
+                    fields.add(luceneFieldToDocField(field));
                 }
             }
 
@@ -315,13 +316,13 @@ class Lucene9Index extends Index {
             if (field.getName().startsWith("_")) {
                 continue;
             }
-            result.add(convertField(field));
+            result.add(docFieldToLuceneField(field));
         }
 
         return result;
     }
 
-    private static IndexableField convertField(final DocField docField) {
+    private static IndexableField docFieldToLuceneField(final DocField docField) {
         if (docField instanceof StringDocField) {
             final StringDocField field = (StringDocField) docField;
             return new StringField(field.getName(), field.getValue(), field.isStored() ? Store.YES : Store.NO);
@@ -335,6 +336,22 @@ class Lucene9Index extends Index {
             return new DoublePoint(field.getName(), field.getValue());
         }
         throw new IllegalArgumentException(docField.getClass() + " not valid");
+    }
+
+    private static DocField luceneFieldToDocField(final IndexableField indexableField) {
+        if (indexableField instanceof StringField) {
+            final StringField field = (StringField) indexableField;
+            return new StringDocField(field.name(), field.stringValue(), field.fieldType().stored());
+        }
+        if (indexableField instanceof TextField) {
+            final TextField field = (TextField) indexableField;
+            return new TextDocField(field.name(), field.stringValue(), field.fieldType().stored());
+        }
+        if (indexableField instanceof DoublePoint) {
+            final DoublePoint field = (DoublePoint) indexableField;
+            return new DoublePointDocField(field.name(), (Double) field.numericValue());
+        }
+        throw new IllegalArgumentException(indexableField.getClass() + " not valid");
     }
 
     private static Query docIdQuery(final String docId) {
