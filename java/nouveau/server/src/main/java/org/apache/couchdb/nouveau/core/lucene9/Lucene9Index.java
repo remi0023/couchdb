@@ -16,6 +16,7 @@ package org.apache.couchdb.nouveau.core.lucene9;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.apache.couchdb.nouveau.api.SearchRequest;
 import org.apache.couchdb.nouveau.api.SearchResults;
 import org.apache.couchdb.nouveau.api.document.DocField;
 import org.apache.couchdb.nouveau.api.document.DoublePointDocField;
+import org.apache.couchdb.nouveau.api.document.StoredDocField;
 import org.apache.couchdb.nouveau.api.document.StringDocField;
 import org.apache.couchdb.nouveau.api.document.TextDocField;
 import org.apache.couchdb.nouveau.core.Index;
@@ -42,7 +44,9 @@ import org.apache.couchdb.nouveau.core.QueryParserException;
 import org.apache.couchdb.nouveau.l9x.lucene.analysis.Analyzer;
 import org.apache.couchdb.nouveau.l9x.lucene.document.Document;
 import org.apache.couchdb.nouveau.l9x.lucene.document.DoublePoint;
+import org.apache.couchdb.nouveau.l9x.lucene.document.Field;
 import org.apache.couchdb.nouveau.l9x.lucene.document.SortedDocValuesField;
+import org.apache.couchdb.nouveau.l9x.lucene.document.StoredField;
 import org.apache.couchdb.nouveau.l9x.lucene.document.StringField;
 import org.apache.couchdb.nouveau.l9x.lucene.document.TextField;
 import org.apache.couchdb.nouveau.l9x.lucene.document.Field.Store;
@@ -336,6 +340,30 @@ class Lucene9Index extends Index {
             final DoublePointDocField field = (DoublePointDocField) docField;
             return new DoublePoint(field.getName(), field.getValue());
         }
+        if (docField instanceof StoredDocField) {
+            final StoredDocField field = (StoredDocField) docField;
+            if (field.getStringValue() != null) {
+                return new StoredField(field.getName(), field.getStringValue());
+            }
+            if (field.getBinaryValue() != null) {
+                return new StoredField(field.getName(), field.getBinaryValue());
+            }
+            if (field.getNumericValue() != null) {
+                final Number value = (Number) field.getNumericValue();
+                if (value instanceof Long) {
+                    return new StoredField(field.getName(), (long) value);
+                }
+                if (value instanceof Integer) {
+                    return new StoredField(field.getName(), (int) value);
+                }
+                if (value instanceof Double) {
+                    return new StoredField(field.getName(), (double) value);
+                }
+                if (value instanceof Float) {
+                    return new StoredField(field.getName(), (float) value);
+                }
+            }
+        }
         throw new IllegalArgumentException(docField.getClass() + " not valid");
     }
 
@@ -351,6 +379,20 @@ class Lucene9Index extends Index {
         if (indexableField instanceof DoublePoint) {
             final DoublePoint field = (DoublePoint) indexableField;
             return new DoublePointDocField(field.name(), (Double) field.numericValue());
+        }
+        if (indexableField instanceof StoredField) {
+            final StoredField field = (StoredField) indexableField;
+            if (field.stringValue() != null) {
+                return new StoredDocField(field.name(), field.stringValue());
+            }
+            if (field.binaryValue() != null) {
+                final BytesRef bytesRef = field.binaryValue();
+                final byte[] bytes = Arrays.copyOfRange(bytesRef.bytes, bytesRef.offset, bytesRef.offset + bytesRef.length);
+                return new StoredDocField(field.name(), bytes);
+            }
+            if (field.numericValue() != null) {
+                return new StoredDocField(field.name(), field.numericValue());
+            }
         }
         throw new IllegalArgumentException(indexableField.getClass() + " not valid");
     }

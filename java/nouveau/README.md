@@ -100,7 +100,7 @@ To ease migration nouveau functions can use the 'index' function exactly as it e
 | index("foo", "bar", {"store":true, "facet":true}); | adds a TextField, a StoredField and a SortedSetDocValuesField.
 | index("foo", "bar", "text");                       | adds a TextField.
 | index("foo", "bar", "string");                     | adds a StringField.
-| index("foo", "bar", "stored_string");              | adds a StoredField.
+| index("foo", "bar", "stored");                     | adds a StoredField.
 | index("foo", "bar", "sorted_set_dv");              | adds a SortedSetDocValuesField.
 | index("foo", "bar", "string", true);               | adds a TextField with Store.YES
 
