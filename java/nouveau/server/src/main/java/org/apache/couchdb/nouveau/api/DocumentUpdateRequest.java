@@ -17,7 +17,6 @@ import java.util.Collection;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import org.apache.couchdb.nouveau.api.document.DocField;
 
@@ -34,7 +33,7 @@ public class DocumentUpdateRequest {
     private String partition;
 
     @NotEmpty
-    private Collection<org.apache.couchdb.nouveau.api.document.DocField> fields;
+    private Collection<DocField> fields;
 
     public DocumentUpdateRequest() {
         // Jackson deserialization
@@ -63,40 +62,6 @@ public class DocumentUpdateRequest {
     @JsonProperty
     public Collection<DocField> getFields() {
         return fields;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (seq ^ (seq >>> 32));
-        result = prime * result + ((partition == null) ? 0 : partition.hashCode());
-        result = prime * result + ((fields == null) ? 0 : fields.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        DocumentUpdateRequest other = (DocumentUpdateRequest) obj;
-        if (seq != other.seq)
-            return false;
-        if (partition == null) {
-            if (other.partition != null)
-                return false;
-        } else if (!partition.equals(other.partition))
-            return false;
-        if (fields == null) {
-            if (other.fields != null)
-                return false;
-        } else if (!fields.equals(other.fields))
-            return false;
-        return true;
     }
 
     @Override
