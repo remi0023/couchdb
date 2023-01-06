@@ -16,19 +16,20 @@ package org.apache.couchdb.nouveau.api;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.dropwizard.jackson.JsonSnakeCase;
 
-import org.apache.couchdb.nouveau.l9x.lucene.search.TotalHits;
-
 @JsonSnakeCase
 public class SearchResults {
 
-    @NotNull
-    private TotalHits totalHits;
+    @Min(0)
+    private long totalHits;
+
+    private String totalHitsRelation;
 
     @NotNull
     private List<@NotNull SearchHit> hits;
@@ -40,13 +41,21 @@ public class SearchResults {
     public SearchResults() {
     }
 
-    public void setTotalHits(final TotalHits totalHits) {
+    public void setTotalHits(final long totalHits) {
         this.totalHits = totalHits;
     }
 
     @JsonProperty
-    public TotalHits getTotalHits() {
+    public long getTotalHits() {
         return totalHits;
+    }
+
+    public String getTotalHitsRelation() {
+        return totalHitsRelation;
+    }
+
+    public void setTotalHitsRelation(String totalHitsRelation) {
+        this.totalHitsRelation = totalHitsRelation;
     }
 
     public void setHits(final List<SearchHit> hits) {

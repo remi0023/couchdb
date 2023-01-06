@@ -218,7 +218,8 @@ class Lucene9Index extends Index {
             hits.add(new SearchHit(doc.get("_id"), (FieldDoc) scoreDoc, fields));
         }
 
-        searchResults.setTotalHits(topDocs.totalHits);
+        searchResults.setTotalHits(topDocs.totalHits.value);
+        searchResults.setTotalHitsRelation(topDocs.totalHits.relation.name());
         searchResults.setHits(hits);
     }
 
