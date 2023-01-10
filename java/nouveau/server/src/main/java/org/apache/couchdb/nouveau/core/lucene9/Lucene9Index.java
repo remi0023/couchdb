@@ -172,12 +172,15 @@ class Lucene9Index extends Index {
     private CollectorManager<?, ? extends TopDocs> hitCollector(final SearchRequest searchRequest) {
         final Sort sort = toSort(searchRequest);
 
-        final FieldDoc after = searchRequest.getAfter();
-        if (after != null) {
+        final Object[] fields = searchRequest.getAfter();
+        final FieldDoc after;
+        if (fields == null) {
+            after = null;
+        } else {
             if (getLastSortField(sort).getReverse()) {
-                after.doc = 0;
+                after = new FieldDoc(0, 0.0f, fields);
             } else {
-                after.doc = Integer.MAX_VALUE;
+                after = new FieldDoc(Integer.MAX_VALUE, 0.0f, fields);
             }
         }
 
@@ -216,8 +219,8 @@ class Lucene9Index extends Index {
                     fields.add(luceneFieldToDocField(field));
                 }
             }
-
-            hits.add(new SearchHit(doc.get("_id"), (FieldDoc) scoreDoc, fields));
+            final FieldDoc fieldDoc = (FieldDoc) scoreDoc;
+            hits.add(new SearchHit(doc.get("_id"), fieldDoc.fields, fields));
         }
 
         searchResults.setTotalHits(topDocs.totalHits.value);

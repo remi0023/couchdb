@@ -14,12 +14,12 @@
 package org.apache.couchdb.nouveau.api;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.apache.couchdb.nouveau.api.document.DocField;
-import org.apache.couchdb.nouveau.l9x.lucene.search.FieldDoc;
 
 import io.dropwizard.jackson.JsonSnakeCase;
 
@@ -30,7 +30,7 @@ public class SearchHit {
     private String id;
 
     @NotNull
-    private FieldDoc order;
+    private Object[] order;
 
     @NotNull
     private Collection<@NotNull DocField> fields;
@@ -38,7 +38,7 @@ public class SearchHit {
     public SearchHit() {
     }
 
-    public SearchHit(final String id, final FieldDoc order, final Collection<DocField> fields) {
+    public SearchHit(final String id, final Object[] order, final Collection<DocField> fields) {
         this.id = id;
         this.order = order;
         this.fields = fields;
@@ -48,7 +48,7 @@ public class SearchHit {
         return id;
     }
 
-    public FieldDoc getOrder() {
+    public Object[] getOrder() {
         return order;
     }
 

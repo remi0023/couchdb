@@ -17,6 +17,7 @@ import static org.apache.couchdb.nouveau.api.LuceneVersion.LUCENE_9;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -94,7 +95,7 @@ public class IntegrationTest {
         searchRequest.setCounts(List.of("bar"));
         searchRequest.setRanges(Map.of("baz", List.of(new DoubleRange("0 to 100 inc", 0.0, true, 100.0, true))));
         searchRequest.setTopN(2);
-        searchRequest.setAfter(new FieldDoc(0, Float.NaN, new Object[]{1.0f, new BytesRef("a")}));
+        searchRequest.setAfter(new Object[]{1.0f, new BytesRef("a")});
 
         response =
                 APP.client().target(String.format("%s/index/%s/search", url, indexName))

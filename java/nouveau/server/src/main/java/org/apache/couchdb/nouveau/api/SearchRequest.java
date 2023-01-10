@@ -24,7 +24,6 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.apache.couchdb.nouveau.api.facet.range.DoubleRange;
-import org.apache.couchdb.nouveau.l9x.lucene.search.FieldDoc;
 
 import io.dropwizard.jackson.JsonSnakeCase;
 
@@ -46,7 +45,7 @@ public class SearchRequest {
 
     private Map<@NotEmpty String, List<@NotNull DoubleRange>> ranges;
 
-    private FieldDoc after;
+    private Object[] after;
 
     @Min(1)
     @Max(100)
@@ -131,12 +130,12 @@ public class SearchRequest {
         return topN;
     }
 
-    public void setAfter(final FieldDoc after) {
+    public void setAfter(final Object[]after) {
         this.after = after;
     }
 
     @JsonProperty
-    public FieldDoc getAfter() {
+    public Object[] getAfter() {
         return after;
     }
 
