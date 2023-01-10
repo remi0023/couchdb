@@ -39,6 +39,7 @@ public class SearchResults {
     private Map<@NotNull String, Map<@NotNull String, Number>> ranges;
 
     public SearchResults() {
+        // Jackson serialization
     }
 
     public void setTotalHits(final long totalHits) {

@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange;
+import org.apache.couchdb.nouveau.api.facet.range.DoubleRange;
 import org.apache.couchdb.nouveau.l9x.lucene.search.FieldDoc;
 
 import io.dropwizard.jackson.JsonSnakeCase;

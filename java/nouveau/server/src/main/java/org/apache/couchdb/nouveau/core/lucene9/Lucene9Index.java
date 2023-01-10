@@ -38,13 +38,13 @@ import org.apache.couchdb.nouveau.api.document.DoublePointDocField;
 import org.apache.couchdb.nouveau.api.document.StoredDocField;
 import org.apache.couchdb.nouveau.api.document.StringDocField;
 import org.apache.couchdb.nouveau.api.document.TextDocField;
+import org.apache.couchdb.nouveau.api.facet.range.DoubleRange;
 import org.apache.couchdb.nouveau.core.Index;
 import org.apache.couchdb.nouveau.core.QueryParser;
 import org.apache.couchdb.nouveau.core.QueryParserException;
 import org.apache.couchdb.nouveau.l9x.lucene.analysis.Analyzer;
 import org.apache.couchdb.nouveau.l9x.lucene.document.Document;
 import org.apache.couchdb.nouveau.l9x.lucene.document.DoublePoint;
-import org.apache.couchdb.nouveau.l9x.lucene.document.Field;
 import org.apache.couchdb.nouveau.l9x.lucene.document.SortedDocValuesField;
 import org.apache.couchdb.nouveau.l9x.lucene.document.StoredField;
 import org.apache.couchdb.nouveau.l9x.lucene.document.StringField;
@@ -57,7 +57,6 @@ import org.apache.couchdb.nouveau.l9x.lucene.facet.FacetsCollectorManager;
 import org.apache.couchdb.nouveau.l9x.lucene.facet.LabelAndValue;
 import org.apache.couchdb.nouveau.l9x.lucene.facet.StringDocValuesReaderState;
 import org.apache.couchdb.nouveau.l9x.lucene.facet.StringValueFacetCounts;
-import org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange;
 import org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRangeFacetCounts;
 import org.apache.couchdb.nouveau.l9x.lucene.index.IndexWriter;
 import org.apache.couchdb.nouveau.l9x.lucene.index.IndexWriterConfig;
@@ -83,7 +82,6 @@ import org.apache.couchdb.nouveau.l9x.lucene.util.BytesRef;
 
 class Lucene9Index extends Index {
 
-    private static final DoubleRange[] EMPTY_DOUBLE_RANGE_ARRAY = new DoubleRange[0];
     private static final Sort DEFAULT_SORT = new Sort(SortField.FIELD_SCORE,
             new SortField("_id", SortField.Type.STRING));
     private static final Pattern SORT_FIELD_RE = Pattern.compile("^([-+])?([\\.\\w]+)(?:<(\\w+)>)?$");
@@ -245,12 +243,29 @@ class Lucene9Index extends Index {
             final Map<String, Map<String, Number>> rangesMap = new HashMap<String, Map<String, Number>>(
                     searchRequest.getRanges().size());
             for (final Entry<String, List<DoubleRange>> entry : searchRequest.getRanges().entrySet()) {
-                final DoubleRangeFacetCounts counts = new DoubleRangeFacetCounts(entry.getKey(), fc,
-                        entry.getValue().toArray(EMPTY_DOUBLE_RANGE_ARRAY));
+                final DoubleRangeFacetCounts counts = new DoubleRangeFacetCounts(entry.getKey(), fc, convertDoubleRanges(entry.getValue()));
                 rangesMap.put(entry.getKey(), collectFacets(counts, searchRequest.getTopN(), entry.getKey()));
             }
             searchResults.setRanges(rangesMap);
         }
+    }
+
+    private org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange[] convertDoubleRanges(final List<DoubleRange> ranges) {
+        final org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange[] result = new org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange[ranges.size()];
+        for (int i = 0; i < ranges.size(); i++) {
+            result[i] = convertDoubleRange(ranges.get(i));
+        }
+        return result;
+    }
+
+    private org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange convertDoubleRange(final DoubleRange range) {
+        return new org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange(
+            range.getLabel(),
+            range.getMin(),
+            range.getMinInclusive(),
+            range.getMax(),
+            range.getMaxInclusive()
+        );
     }
 
     private Map<String, Number> collectFacets(final Facets facets, final int topN, final String dim)

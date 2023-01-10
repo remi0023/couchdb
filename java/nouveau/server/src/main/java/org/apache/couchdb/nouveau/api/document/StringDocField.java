@@ -15,6 +15,9 @@ package org.apache.couchdb.nouveau.api.document;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.dropwizard.jackson.JsonSnakeCase;
+
+@JsonSnakeCase
 public final class StringDocField extends DocField {
 
     private String value;

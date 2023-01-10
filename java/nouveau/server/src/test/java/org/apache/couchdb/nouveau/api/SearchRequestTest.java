@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange;
+import org.apache.couchdb.nouveau.api.facet.range.DoubleRange;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

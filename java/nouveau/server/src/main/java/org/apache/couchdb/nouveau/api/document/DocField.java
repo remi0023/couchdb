@@ -16,14 +16,19 @@ package org.apache.couchdb.nouveau.api.document;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+
+import io.dropwizard.jackson.JsonSnakeCase;
+
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = As.PROPERTY, property = "@type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = StringDocField.class, name = "string"),
         @JsonSubTypes.Type(value = TextDocField.class, name = "text"),
-        @JsonSubTypes.Type(value = DoublePointDocField.class, name = "double_point")
+        @JsonSubTypes.Type(value = DoublePointDocField.class, name = "double_point"),
+        @JsonSubTypes.Type(value = StoredDocField.class, name = "stored")
 })
+@JsonSnakeCase
 public abstract class DocField {
 
     protected String name;

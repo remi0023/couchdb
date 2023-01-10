@@ -15,6 +15,9 @@ package org.apache.couchdb.nouveau.api.document;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.dropwizard.jackson.JsonSnakeCase;
+
+@JsonSnakeCase
 public class DoublePointDocField extends DocField {
 
     private double value;

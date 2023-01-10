@@ -30,7 +30,7 @@ import org.apache.couchdb.nouveau.api.SearchRequest;
 import org.apache.couchdb.nouveau.api.SearchResults;
 import org.apache.couchdb.nouveau.api.document.StringDocField;
 import org.apache.couchdb.nouveau.api.document.TextDocField;
-import org.apache.couchdb.nouveau.l9x.lucene.facet.range.DoubleRange;
+import org.apache.couchdb.nouveau.api.facet.range.DoubleRange;
 import org.apache.couchdb.nouveau.l9x.lucene.search.FieldDoc;
 import org.apache.couchdb.nouveau.l9x.lucene.search.TotalHits;
 import org.apache.couchdb.nouveau.l9x.lucene.search.TotalHits.Relation;
