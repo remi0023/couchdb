@@ -14,8 +14,8 @@
 package org.apache.couchdb.nouveau.core.ser;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.couchdb.nouveau.api.After;
 import org.apache.couchdb.nouveau.api.DoubleRange;
@@ -24,10 +24,20 @@ import org.apache.couchdb.nouveau.api.document.StoredDoubleField;
 import org.apache.couchdb.nouveau.api.document.StoredStringField;
 import org.apache.couchdb.nouveau.api.document.StringField;
 import org.apache.couchdb.nouveau.api.document.TextField;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.PrefixQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryVisitor;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class SerializationTest {
 
@@ -36,6 +46,10 @@ public class SerializationTest {
     @BeforeAll
     public static void setupMapper() {
         mapper = new ObjectMapper();
+        mapper.registerModule(new SimpleModule() {{
+            addSerializer(Query.class, new QuerySerializer());
+            addDeserializer(Query.class, new QueryDeserializer());
+        }});
     }
 
     @Test
@@ -151,6 +165,19 @@ public class SerializationTest {
         assertEquals(true, actual.isMinInclusive());
         assertEquals(52.1, actual.getMax());
         assertEquals(true, actual.isMaxInclusive());
+    }
+
+    @Test
+    public void testSerializeQuery() throws Exception {
+        final String expected = "{}";
+        final BooleanQuery.Builder b = new BooleanQuery.Builder();
+        b.add(new TermQuery(new Term("foo", "bar")), Occur.MUST);
+        b.add(new PrefixQuery(new Term("foo", "bar")), Occur.SHOULD);
+        b.add(new WildcardQuery(new Term("foo", "bar*baz")), Occur.FILTER);
+        b.add(new MatchAllDocsQuery(), Occur.MUST_NOT);
+        final Query q = b.build();
+        final String actual = mapper.writeValueAsString(q);
+        assertEquals(expected, actual);
     }
 
 }
