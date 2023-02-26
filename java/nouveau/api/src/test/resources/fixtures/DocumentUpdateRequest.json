@@ -5,18 +5,18 @@
       "@type": "string",
       "name": "stringfoo",
       "value": "bar",
-      "stored": true
+      "store": true
     },
     {
       "@type": "text",
       "name": "textfoo",
       "value": "hello there",
-      "stored": true
+      "store": true
     },
     {
-      "@type": "double_point",
+      "@type": "double",
       "name": "doublefoo",
-      "value": [12]
+      "value": 12
     }
   ]
 }

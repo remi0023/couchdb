@@ -25,11 +25,7 @@ import io.dropwizard.jackson.JsonSnakeCase;
     include = JsonTypeInfo.As.PROPERTY,
     property = "@type")
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = DoubleDocValuesField.class, name = "double_dv"),
     @JsonSubTypes.Type(value = DoubleField.class, name = "double"),
-    @JsonSubTypes.Type(value = DoublePoint.class, name = "double_point"),
-    @JsonSubTypes.Type(value = SortedDocValuesField.class, name = "sorted_dv"),
-    @JsonSubTypes.Type(value = SortedSetDocValuesField.class, name = "sorted_set_dv"),
     @JsonSubTypes.Type(value = StoredDoubleField.class, name = "stored_double"),
     @JsonSubTypes.Type(value = StoredStringField.class, name = "stored_string"),
     @JsonSubTypes.Type(value = StringField.class, name = "string"),

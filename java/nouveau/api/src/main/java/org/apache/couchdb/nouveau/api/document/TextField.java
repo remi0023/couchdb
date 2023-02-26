@@ -13,19 +13,36 @@
 
 package org.apache.couchdb.nouveau.api.document;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(value=Include.NON_DEFAULT)
 public final class TextField extends Field {
 
     private final String value;
 
-    private final boolean stored;
+    private final boolean store;
 
-    public TextField(@JsonProperty("name") final String name, @JsonProperty("value") final String value,
-            @JsonProperty("stored") final boolean stored) {
+    private final boolean facet;
+
+    private final boolean sortable;
+
+    @JsonCreator
+    public TextField(
+        @NotNull @JsonProperty("name") final String name,
+        @NotNull @JsonProperty("value") final String value,
+        @JsonProperty("store") final boolean store,
+        @JsonProperty("facet") final boolean facet,
+        @JsonProperty("sortable") final boolean sortable) {
         super(name);
         this.value = value;
-        this.stored = stored;
+        this.store = store;
+        this.facet = facet;
+        this.sortable = sortable;
     }
 
     @JsonProperty
@@ -34,13 +51,24 @@ public final class TextField extends Field {
     }
 
     @JsonProperty
-    public boolean isStored() {
-        return stored;
+    public boolean isStore() {
+        return store;
+    }
+
+    @JsonProperty
+    public boolean isFacet() {
+        return facet;
+    }
+
+    @JsonProperty
+    public boolean isSortable() {
+        return sortable;
     }
 
     @Override
     public String toString() {
-        return "TextField [name=" + name + ", value=" + value + ", stored=" + stored + "]";
+        return "TextField [name=" + name + ", value=" + value + ", store=" + store + ", facet=" + facet + ", sortable=" + sortable
+                + "]";
     }
 
 }

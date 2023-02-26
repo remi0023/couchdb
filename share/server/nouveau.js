@@ -32,78 +32,67 @@ var Nouveau = (function() {
   };
 
   return {
-    index: function(name, value) {
-      assertType('name', 'string', name);
-
-      if (name.substring(0, 1) === '_') {
-        throw({name: 'ReservedName', message: 'name must not start with an underscore'});
-      }
+    index: function() {
 
       // Dreyfus compatibility.
       if (arguments.length == 2 || (arguments.length == 3 && typeof arguments[2] == 'object')) {
-        options = arguments[2] || {};
+
+        var name = arguments[0];
+        var value = arguments[1];
+        var options = arguments[2] || {};
+
+        assertType('name', 'string', name);
+
+        if (name.substring(0, 1) === '_') {
+          throw({name: 'ReservedName', message: 'name must not start with an underscore'});
+        }
+
         if (typeof value == 'boolean') {
           // coerce to string as handling is the same.
           value = value ? 'true' : 'false'
         }
-        switch (typeof value) {
-        case 'string':
-          index_results.push({'@type': 'text', 'name': name, 'value': value, 'stored': options.store || false});
-          index_results.push({'@type': 'sorted_dv', 'name': name, 'value': value}); // for sorting.
-          if (options.facet) {
-            index_results.push({'@type': 'sorted_set_dv', 'name': name, 'value': value});
-          }
-          break;
-        case 'number':
-          index_results.push({'@type': 'double_point', 'name': name, 'value': [value]});
-          if (options.store) {
-            index_results.push({'@type': 'stored_double', 'name': name, 'value': value});
-          }
-          if (options.facet) {
-            index_results.push({'@type': 'double_dv', 'name': name, 'value': value});
-          }
-          break;
-        default:
+
+        if (!(typeof value == 'string' || typeof value == 'number')) {
           throw({name: 'TypeError', message: 'value must be a string, a number or boolean not ' + typeof value});
         }
-        return;
-      }
 
-      var type = arguments[2];
-      assertType('type', 'string', type);
+        index_results.push({
+          '@type': typeof value == 'string' ? 'string' : 'double',
+          'name': name,
+          'value': value,
+          'store': options.store|| false,
+          'facet': options.facet|| false
+        });
+      } else { // nouveau api
+        var type = arguments[0];
+        var name = arguments[1];
 
-      switch (type) {
-      case 'sorted_set_dv':
-      case 'sorted_dv':
-        assertType('value', 'string', value);
-        index_results.push({'@type': type, 'name': name, 'value': value});
-        break;
-      case 'double_point':
-        assertType('value', 'number', value);
-        index_results.push({'@type': type, 'name': name, 'value': [value]});
-        break;
-      case 'double_dv':
-        assertType('value', 'number', value);
-        index_results.push({'@type': type, 'name': name, 'value': value});
-        break;
-      case 'string':
-      case 'text':
-        assertType('value', 'string', value);
-        if (arguments.length === 4) {
-          assertType('boolean', arguments[3]);
+        assertType('type', 'string', type);
+        assertType('name', 'string', name);
+
+        if (name.substring(0, 1) === '_') {
+          throw({name: 'ReservedName', message: 'name must not start with an underscore'});
         }
-        index_results.push({'@type': type, 'name': name, 'value': value, 'stored': arguments[3] || false});
-        break;
-      case 'stored_double':
-        assertType('value', 'number', value);
-        index_results.push({'@type': type, 'name': name, 'value': value});
-        break;
-      case 'stored_string':
-        assertType('value', 'string', value);
-        index_results.push({'@type': type, 'name': name, 'value': value});
-        break;
-      default:
-        throw({name: 'TypeError', message: type + ' not supported'});
+
+        switch (type) {
+        case 'double':
+        case 'string':
+        case 'text':
+          var value = arguments[2];
+          var options = arguments[3];
+          assertType('value', type == 'double' ? 'number' : 'string', value);
+          index_results.push({
+            '@type': type,
+            'name': name,
+            'value': value,
+            'store': options.store|| false
+            'facet': options.facet|| false,
+            'sortable': options.sortable|| true
+          });
+          break;
+        default:
+          throw({name: 'TypeError', message: type + ' not supported'});
+        }
       }
     },
 

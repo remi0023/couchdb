@@ -32,9 +32,8 @@ import org.apache.couchdb.nouveau.api.DoubleRange;
 import org.apache.couchdb.nouveau.api.IndexDefinition;
 import org.apache.couchdb.nouveau.api.SearchRequest;
 import org.apache.couchdb.nouveau.api.SearchResults;
-import org.apache.couchdb.nouveau.api.document.DoubleDocValuesField;
-import org.apache.couchdb.nouveau.api.document.DoublePoint;
-import org.apache.couchdb.nouveau.api.document.SortedSetDocValuesField;
+import org.apache.couchdb.nouveau.api.document.DoubleField;
+import org.apache.couchdb.nouveau.api.document.StringField;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -93,9 +92,9 @@ public class IntegrationTest {
         for (int i = 0; i < 10; i++) {
             final DocumentUpdateRequest docUpdate = new DocumentUpdateRequest(i + 1, null,
                 List.of(
-                    new DoublePoint("foo", i),
-                    new DoubleDocValuesField("baz", i),
-                    new SortedSetDocValuesField("bar", new byte[]{'b', 'a', 'z'})));
+                    new DoubleField("foo", i, false, false, false),
+                    new DoubleField("baz", i, false, true, false),
+                    new StringField("bar", "baz", false, true, false)));
             response =
                 APP.client().target(String.format("%s/index/%s/doc/doc%d", url, indexName, i))
                 .request()

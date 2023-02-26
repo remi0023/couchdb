@@ -13,6 +13,8 @@
 
 package org.apache.couchdb.nouveau.api.document;
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,7 +23,7 @@ public final class StoredDoubleField extends Field {
     private final double value;
 
     @JsonCreator
-    public StoredDoubleField(@JsonProperty("name") final String name, @JsonProperty("value") final double value) {
+    public StoredDoubleField(@NotNull @JsonProperty("name") final String name, @NotNull @JsonProperty("value") final double value) {
         super(name);
         this.value = value;
     }
