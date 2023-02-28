@@ -73,6 +73,9 @@ public class NouveauApplication extends Application<NouveauApplicationConfigurat
 
         final ObjectMapper objectMapper = environment.getObjectMapper();
 
+        Class<?> dummy4Class = null;
+        Class<?> dummy9Class = null;
+
         // The clever bit.
         final Map<Integer, Lucene> lucenes = new HashMap<Integer, Lucene>();
         for (final URL luceneBundlePath : configuration.getLuceneBundlePaths()) {
@@ -84,6 +87,13 @@ public class NouveauApplication extends Application<NouveauApplicationConfigurat
                     final Lucene lucene = ((LuceneBundle)bundle).getLucene();
                     lucenes.put(lucene.getMajor(), lucene);
                     LOGGER.info("Loaded bundle for Lucene {} from {}", lucene.getMajor(), luceneBundlePath);
+
+                    if (lucene.getMajor() == 4) {
+                        dummy4Class = classLoader.loadClass("org.apache.couchdb.nouveau.core.lucene4.Dummy4");
+                    }
+                    if (lucene.getMajor() == 9) {
+                        dummy9Class = classLoader.loadClass("org.apache.couchdb.nouveau.core.lucene9.Dummy9");
+                    }
                 }
             }
         }
@@ -117,6 +127,15 @@ public class NouveauApplication extends Application<NouveauApplicationConfigurat
         // health checks
         environment.healthChecks().register("analyzeResource", new AnalyzeHealthCheck(analyzeResource));
         environment.healthChecks().register("indexManager", new IndexManagerHealthCheck(indexManager));
+
+        LOGGER.info("object mapper:" + objectMapper.getRegisteredModuleIds());
+
+        if (dummy4Class != null) {
+            LOGGER.info("4: {}", objectMapper.readValue("{\"field\":12}", dummy4Class));
+        }
+        if (dummy9Class != null) {
+            LOGGER.info("9: {}", objectMapper.readValue("{\"field\":12}", dummy9Class));
+        }
     }
 
 }

@@ -13,6 +13,8 @@ public final class Lucene9Bundle<Configuration> implements LuceneBundle<Configur
     public void run(final Configuration configuration, final Environment environment) throws Exception {
         lucene = new Lucene9();
         lucene.setExecutor(environment.lifecycle().executorService("nouveau-lucene9-%d").build());
+
+        environment.getObjectMapper().registerModule(new Lucene9Module());
     }
 
     @Override

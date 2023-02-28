@@ -33,6 +33,11 @@
       <artifactId>dropwizard-core</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+
     <!-- Lucene -->
     <dependency>
       <groupId>org.apache.lucene</groupId>
