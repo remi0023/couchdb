@@ -39,9 +39,6 @@ public class NouveauApplicationConfiguration extends Configuration {
     @NotNull
     private Path rootDir = null;
 
-    @NotEmpty
-    private URL[] luceneBundlePaths;
-
     @JsonProperty
     public void setMaxIndexesOpen(int maxIndexesOpen) {
         this.maxIndexesOpen = maxIndexesOpen;
@@ -78,20 +75,11 @@ public class NouveauApplicationConfiguration extends Configuration {
         return rootDir;
     }
 
-    @JsonProperty
-    public void setLuceneBundlePaths(final URL... luceneBundlePaths) {
-        this.luceneBundlePaths = luceneBundlePaths;
-    }
-
-    public URL[] getLuceneBundlePaths() {
-        return luceneBundlePaths;
-    }
-
     @Override
     public String toString() {
         return "NouveauApplicationConfiguration [maxIndexesOpen=" + maxIndexesOpen + ", commitIntervalSeconds="
                 + commitIntervalSeconds + ", idleSeconds=" + idleSeconds + ", rootDir=" + rootDir
-                + ", luceneBundlePaths=" + Arrays.toString(luceneBundlePaths) + "]";
+                + "]";
     }
 
 }

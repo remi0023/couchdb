@@ -58,11 +58,7 @@ public class IntegrationTest {
             String.format("file://%s/.m2/repository/org/apache/couchdb/nouveau/lucene9/1.0-SNAPSHOT/lucene9-1.0-SNAPSHOT-dist.jar",
             System.getProperty("user.home"));
 
-        try {
-            CONFIG.setLuceneBundlePaths(new URL(path));
-        } catch (MalformedURLException e) {
-            throw new Error(e);
-        }
+        System.setProperty("nouveau.bundle.9", path);
 
         APP = new DropwizardAppExtension<>(NouveauApplication.class, CONFIG);
     }

@@ -13,9 +13,12 @@
 
 package org.apache.couchdb.nouveau;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ScheduledExecutorService;
@@ -38,14 +41,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
-import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
-import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
 public class NouveauApplication extends Application<NouveauApplicationConfiguration> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NouveauApplication.class);
+
+    private Collection<LuceneBundle> bundles = new HashSet<LuceneBundle>();
 
     public static void main(String[] args) throws Exception {
         new NouveauApplication().run(args);
@@ -58,12 +61,23 @@ public class NouveauApplication extends Application<NouveauApplicationConfigurat
 
     @Override
     public void initialize(Bootstrap<NouveauApplicationConfiguration> bootstrap) {
-        // Enable variable substitution with environment variables
-        bootstrap.setConfigurationSourceProvider(
-                new SubstitutingSourceProvider(bootstrap.getConfigurationSourceProvider(),
-                                                   new EnvironmentVariableSubstitutor(false)
-                )
-        );
+        // Find Lucene bundles
+        for (String name : System.getProperties().stringPropertyNames()) {
+            if (name.startsWith("nouveau.bundle.")) {
+                try {
+                    ClassLoader classLoader = URLClassLoader.newInstance(new URL[]{new URL(System.getProperty(name))});
+                    final ServiceLoader<ConfiguredBundle> bundleLoader = ServiceLoader.load(ConfiguredBundle.class, classLoader);
+                for (final ConfiguredBundle<Configuration> bundle : bundleLoader) {
+                    if (bundle instanceof LuceneBundle) {
+                        bootstrap.addBundle(bundle);
+                        bundles.add((LuceneBundle<?>)bundle);
+                    }
+                }
+                } catch (final MalformedURLException e) {
+                    throw new Error(e);
+                }
+            }
+        }
     }
 
     @Override
@@ -73,29 +87,11 @@ public class NouveauApplication extends Application<NouveauApplicationConfigurat
 
         final ObjectMapper objectMapper = environment.getObjectMapper();
 
-        Class<?> dummy4Class = null;
-        Class<?> dummy9Class = null;
-
-        // The clever bit.
         final Map<Integer, Lucene> lucenes = new HashMap<Integer, Lucene>();
-        for (final URL luceneBundlePath : configuration.getLuceneBundlePaths()) {
-            final ClassLoader classLoader = URLClassLoader.newInstance(new URL[]{luceneBundlePath});
-            final ServiceLoader<ConfiguredBundle> bundleLoader = ServiceLoader.load(ConfiguredBundle.class, classLoader);
-            for (final ConfiguredBundle<Configuration> bundle : bundleLoader) {
-                if (bundle instanceof LuceneBundle) {
-                    bundle.run(configuration, environment);
-                    final Lucene lucene = ((LuceneBundle)bundle).getLucene();
-                    lucenes.put(lucene.getMajor(), lucene);
-                    LOGGER.info("Loaded bundle for Lucene {} from {}", lucene.getMajor(), luceneBundlePath);
-
-                    if (lucene.getMajor() == 4) {
-                        dummy4Class = classLoader.loadClass("org.apache.couchdb.nouveau.core.lucene4.Dummy4");
-                    }
-                    if (lucene.getMajor() == 9) {
-                        dummy9Class = classLoader.loadClass("org.apache.couchdb.nouveau.core.lucene9.Dummy9");
-                    }
-                }
-            }
+        for (final LuceneBundle bundle : bundles) {
+            final Lucene lucene = ((LuceneBundle)bundle).getLucene();
+            lucenes.put(lucene.getMajor(), lucene);
+            LOGGER.info("Loaded bundle for Lucene {}", lucene.getMajor());
         }
 
         if (lucenes.isEmpty()) {
@@ -127,15 +123,6 @@ public class NouveauApplication extends Application<NouveauApplicationConfigurat
         // health checks
         environment.healthChecks().register("analyzeResource", new AnalyzeHealthCheck(analyzeResource));
         environment.healthChecks().register("indexManager", new IndexManagerHealthCheck(indexManager));
-
-        LOGGER.info("object mapper:" + objectMapper.getRegisteredModuleIds());
-
-        if (dummy4Class != null) {
-            LOGGER.info("4: {}", objectMapper.readValue("{\"field\":12}", dummy4Class));
-        }
-        if (dummy9Class != null) {
-            LOGGER.info("9: {}", objectMapper.readValue("{\"field\":12}", dummy9Class));
-        }
     }
 
 }
