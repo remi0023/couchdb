@@ -367,7 +367,7 @@ convert_nouveau_fields([{Name, <<"string">>, Value} | Rest]) ->
 convert_nouveau_fields([{Name, <<"number">>, Value} | Rest]) ->
     Field =
         {[
-            {<<"@type">>, <<"double">},
+            {<<"@type">>, <<"double">>},
             {<<"name">>, Name},
             {<<"value">>, Value}
         ]},

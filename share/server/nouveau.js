@@ -79,13 +79,13 @@ var Nouveau = (function() {
         case 'string':
         case 'text':
           var value = arguments[2];
-          var options = arguments[3];
+          var options = arguments[3] || {};
           assertType('value', type == 'double' ? 'number' : 'string', value);
           index_results.push({
             '@type': type,
             'name': name,
             'value': value,
-            'store': options.store|| false
+            'store': options.store|| false,
             'facet': options.facet|| false,
             'sortable': options.sortable|| true
           });
