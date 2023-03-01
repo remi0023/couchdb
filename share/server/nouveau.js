@@ -60,10 +60,11 @@ var Nouveau = (function() {
           '@type': typeof value == 'string' ? 'string' : 'double',
           'name': name,
           'value': value,
-          'store': options.store|| false,
+          'stored': options.store|| false,
           'facet': options.facet|| false
         });
-      } else { // nouveau api
+      } else {
+        // Nouveau API.
         var type = arguments[0];
         var name = arguments[1];
 
@@ -85,9 +86,7 @@ var Nouveau = (function() {
             '@type': type,
             'name': name,
             'value': value,
-            'store': options.store|| false,
-            'facet': options.facet|| false,
-            'sortable': options.sortable|| true
+            'stored': options.store
           });
           break;
         default:
