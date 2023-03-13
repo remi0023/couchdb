@@ -514,13 +514,13 @@ derived:
 # Nouveau
 ################################################################################
 
-.PHONY: nouveau
-nouveau:
-	@cd java/nouveau/server && mvn test
+.PHONY: nouveau-test
+nouveau-test:
+	@cd java/nouveau && mvn test
 
 .PHONY: nouveau-clean
 nouveau-clean:
-	@cd java/nouveau/server && mvn clean
+	@cd java/nouveau && mvn clean
 
 .PHONY: nouveau-install
 nouveau-install:
