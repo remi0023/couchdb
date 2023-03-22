@@ -113,7 +113,9 @@ and ``-kernel inet_dist_listen_max 9200`` like below:
     -kernel inet_dist_listen_max 9200
 
 Again, a small range is fine, down to a single port (set both to ``9100``) if you
-only ever run a single CouchDB node on each machine.
+only ever run a single CouchDB node on each machine. Also check that 
+``-kernel dist_use_interface`` contains required network interfaces. In case 
+``-kernel dist_use_interface`` is not declared erlang listens on all network interfaces.
 
 Confirming connectivity between nodes
 -------------------------------------
@@ -277,7 +279,7 @@ should show all of the nodes in your cluster:
       ]
     }
 
-The ``cluster_nodes`` section is the list of *expected* nodes; the ``all_nodes``
+The ``all_nodes`` section is the list of *expected* nodes; the ``cluster_nodes``
 section is the list of *actually connected* nodes. Be sure the two lists match.
 
 Now your cluster is ready and available! You can send requests to any one of
